@@ -7,7 +7,7 @@ include {
     COMPUTE_FRF;
     MEAN_FRF;
     FODF_METRICS
-} from '../processes/FODF.nf'
+} from '../processes/FODF_processes.nf'
 
 workflow FODF {
     take:

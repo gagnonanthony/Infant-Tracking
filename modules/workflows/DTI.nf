@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 include {
     EXTRACT_DTI_SHELL;
     DTI_METRICS
-} from '../processes/DTI.nf'
+} from '../processes/DTI_processes.nf'
 
 workflow DTI {
     take:

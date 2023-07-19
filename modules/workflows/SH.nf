@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 include {
     SH_FITTING_SHELL;
     SH_FITTING
-} from '../processes/SH.nf'
+} from '../processes/SH_processes.nf'
 
 workflow SH {
     take:

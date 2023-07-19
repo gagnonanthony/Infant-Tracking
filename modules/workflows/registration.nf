@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 include {
     REGISTER_ANAT
-} from '../processes/registration.nf'
+} from '../processes/registration_processes.nf'
 
 workflow REGISTRATION {
     take:

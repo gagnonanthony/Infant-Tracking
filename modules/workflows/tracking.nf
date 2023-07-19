@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 include {
     GENERATE_MASKS;
     LOCAL_TRACKING
-} from '../processes/tracking.nf'
+} from '../processes/tracking_processes.nf'
 
 workflow TRACKING {
     take:
