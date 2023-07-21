@@ -133,8 +133,10 @@ OPTIONAL ARGUMENTS (current value)
     --theta                                     Maximum angle between 2 steps. ($theta)
     --min_len                                   Minimum length for a streamline. ($min_len)
     --max_len                                   Maximum length for a streamline. ($max_len)
+    --compress_value                            Compression error threshold. ($compress_value)                                  
     --tracking_seed                             List of random seed numbers for the random number generator. ($tracking_seed)
                                                 Please write them as a list separated by commas without space e.g. (--tracking_seed 1,2,3)
+
     PROCESSES OPTIONS
     --processes_denoise_dwi                     Number of processes for DWI denoising task ($processes_denoise_dwi)
     --processes_eddy                            Number of processes for EDDY task. ($processes_eddy)

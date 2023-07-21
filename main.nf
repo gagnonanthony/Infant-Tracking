@@ -112,6 +112,7 @@ def display_usage () {
                 "min_len":"$params.min_len",
                 "max_len":"$params.max_len",
                 "use_brain_mask_as_tracking_mask":"$params.use_brain_mask_as_tracking_mask",
+                "compress_value":"$params.compress",
                 "processes_denoise_dwi":"$params.processes_denoise_dwi",
                 "processes_eddy":"$params.processes_eddy",
                 "processes_registration":"$params.processes_registration",
