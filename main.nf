@@ -53,10 +53,14 @@ workflow {
                  FODF.out.fodf,
                  fa_channel)
 
-        workflow.onComplete {
-            log.info "Pipeline completed at : $workflow.complete"
-            log.info "Execution status : ${ workflow.success ? 'COMPLETED' : 'FAILED'}"
-            log.info "Execution duration : $workflow.duration"}
+    }
+}
+
+if (!params.help) {
+    workflow.onComplete = {
+        log.info "Pipeline completed at : $workflow.complete"
+        log.info "Execution status : ${ workflow.success ? 'COMPLETED' : 'FAILED'}"
+        log.info "Execution duration : $workflow.duration"
     }
 }
 
@@ -112,7 +116,7 @@ def display_usage () {
                 "min_len":"$params.min_len",
                 "max_len":"$params.max_len",
                 "use_brain_mask_as_tracking_mask":"$params.use_brain_mask_as_tracking_mask",
-                "compress_value":"$params.compress",
+                "compress_value":"$params.compress_value",
                 "processes_denoise_dwi":"$params.processes_denoise_dwi",
                 "processes_eddy":"$params.processes_eddy",
                 "processes_registration":"$params.processes_registration",
