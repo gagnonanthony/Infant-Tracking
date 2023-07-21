@@ -44,7 +44,8 @@ process LOCAL_TRACKING {
         tmp.trk --algo $params.algo --$params.seeding $params.nb_seeds\
         --seed $params.tracking_seed --step $params.step_size --theta $params.theta\
         --sfthres $params.sfthres --min_length $params.min_len\
-        --max_length $params.max_len --sh_basis $params.sh_fitting_basis
+        --max_length $params.max_len --sh_basis $params.sh_fitting_basis\
+        --compress $params.compress_value
     scil_remove_invalid_streamlines.py tmp.trk\
         ${sid}__local_tracking.trk --remove_single_point
     """
@@ -54,7 +55,8 @@ process LOCAL_TRACKING {
         tmp.trk --algo $params.algo --$params.seeding $params.nb_seeds\
         --seed $params.tracking_seed --step $params.step_size --theta $params.theta\
         --sfthres $params.sfthres --min_length $params.min_len\
-        --max_length $params.max_len --sh_basis $params.sh_fitting_basis
+        --max_length $params.max_len --sh_basis $params.sh_fitting_basis\
+        --compress $params.compress_value
     scil_remove_invalid_streamlines.py tmp.trk\
         ${sid}__local_tracking.trk --remove_single_point
     """
