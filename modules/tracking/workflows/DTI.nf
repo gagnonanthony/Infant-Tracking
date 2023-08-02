@@ -24,4 +24,5 @@ workflow DTI {
 
     emit:
         fa_and_md = DTI_METRICS.out.fa_and_md
+        ad_and_rd = DTI_METRICS.out.ad_and_rd
 }

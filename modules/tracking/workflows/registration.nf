@@ -22,4 +22,5 @@ workflow REGISTRATION {
 
     emit:
         warped_anat = REGISTER_ANAT.out.warped_anat
+        transfos = REGISTER_ANAT.out.transfos
 }

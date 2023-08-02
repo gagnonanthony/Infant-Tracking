@@ -17,11 +17,13 @@ process REGISTER_ANAT {
         path("${sid}__wm_mask_warped.nii.gz"), emit: warped_anat
         tuple val(sid),
         path("output0GenericAffine.mat"),
-        path("outputInverseWarped.nii.gz"),
         path("synoutput0Warp.nii.gz"),
+        path("maskoutput0Warp.nii.gz"), emit: transfos
+        tuple val(sid),
+        path("outputInverseWarped.nii.gz"),
         path("synoutput0InverseWarp.nii.gz"),
-        path("maskoutput0Warp.nii.gz"),
-        path("maskoutput0InverseWarp.nii.gz"), emit: transfos
+        path("maskoutput0InverseWarp.nii.gz"), emit: inverse_transfo
+
     script:
     //** For some reason, mapping of the masks isn't as good as the t2w, performing a final SyN registration **//
     //** to fit the brain mask properly. **//
