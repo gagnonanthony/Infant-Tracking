@@ -32,8 +32,8 @@ process COMPUTE_CONNECTIVITY {
     """
     metrics_args=""
     for metric in $metrics; do
-        base_name=\$(basename \${metric/.nii.gz/})
-        metrics_args="\${metrics_args} --metrics \${metric} \$(base_name .nii.gz).npy"
+        base_name=\$(basename \${metric})
+        metrics_args="\${metrics_args} --metrics \${metric} \$(basename \$base_name .nii.gz).npy"
     done
 
     scil_compute_connectivity.py $h5 $labels \
@@ -41,7 +41,5 @@ process COMPUTE_CONNECTIVITY {
         --length ${sid}__len.npy \$metrics_args --density_weighting \
         --no_self_connection --include_dps ./ \
         --processes $params.processes_connectivity
-    
-    
     """
 }
