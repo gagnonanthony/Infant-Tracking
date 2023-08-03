@@ -8,15 +8,12 @@ include {
 
 workflow REGISTRATION {
     take:
-        dwi_channel
+        md_channel
         t2w_and_mask
-        fa_channel
     main:
-
-        register_channel = dwi_channel
-            .map{[it[0], it[1], it[2]]}
-            .combine(t2w_and_mask, by: 0)
-            .combine(fa_channel, by: 0)
+        
+        register_channel = t2w_and_mask
+            .combine(md_channel, by: 0)
 
         REGISTER_ANAT(register_channel)
 

@@ -161,12 +161,10 @@ OPTIONAL ARGUMENTS (current value)
     --manual_frf                                FRF set manually (--manual_frf "$manual_frf")
     
     SEEDING AND TRAKING OPTIONS
-    --use_brain_mask_as_tracking_mask           If selected, will use the complete brain mask (including GM, CSF and WM) as a tracking mask.
-                                                Be careful when examining your results, if the hemispheres are not properly separated by the mask,
-                                                streamlines could connect both hemisphere in the superior regions. Default is false and WM mask
-                                                is used as a tracking mask. ($use_brain_mask_as_tracking_mask)
-    --fa_seeding_mask_thr                       Minimal FA threshold to generate a binary fa mask for seeding and tracking.
-                                                ($fa_seeding_mask_thr)
+    --fa_seeding_mask_thr                       Minimal FA threshold to generate a binary fa mask for seeding and 
+                                                tracking. ($fa_seeding_mask_thr)
+    --erosion                                   Number of voxel to remove from brain mask. Use to remove aberrant
+                                                voxel in fa maps. ($erosion)
     --algo                                      Tracking algorithm [prob, det]. ($algo)
     --nb_seeds                                  Number of seeds related to the seeding type param. ($nb_seeds)
     --seeding                                   Seeding type [npv, nt]. ($seeding)

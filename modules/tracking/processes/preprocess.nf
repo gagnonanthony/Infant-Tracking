@@ -187,10 +187,9 @@ process CROP_ANAT {
     cpus 1
 
     input:
-        tuple val(sid), path(t2w), path(brain_mask), path(wm_mask)
+        tuple val(sid), path(t2w), path(wm_mask)
     output:
-        tuple val(sid), path("${sid}__t2w_cropped.nii.gz"), path("${sid}__brain_mask_cropped.nii.gz"),
-        path("${sid}__wm_mask_cropped.nii.gz"), emit: cropped_t2w_and_mask
+        tuple val(sid), path("${sid}__t2w_cropped.nii.gz"), path("${sid}__wm_mask_cropped.nii.gz"), emit: cropped_t2w_and_mask
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -198,8 +197,6 @@ process CROP_ANAT {
     export OPENBLAS_NUM_THREADS=1
     scil_crop_volume.py $t2w ${sid}__t2w_cropped.nii.gz\
         --output_bbox t2w_boundingBox.pkl -f
-    scil_crop_volume.py $brain_mask ${sid}__brain_mask_cropped.nii.gz\
-        --input_bbox t2w_boundingBox.pkl -f
     scil_crop_volume.py $wm_mask ${sid}__wm_mask_cropped.nii.gz\
         --input_bbox t2w_boundingBox.pkl -f
     """
@@ -210,10 +207,9 @@ process RESAMPLE_ANAT {
     cpus 1
 
     input:
-        tuple val(sid), path(t2w), path(brain_mask), path(wm_mask)
+        tuple val(sid), path(t2w), path(wm_mask)
     output:
-        tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__brain_mask_resampled.nii.gz"),
-        path("${sid}__wm_mask_resampled.nii.gz"), emit: t2w_and_mask
+        tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__wm_mask_resampled.nii.gz"), emit: t2w_and_mask
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -221,11 +217,6 @@ process RESAMPLE_ANAT {
     export OPENBLAS_NUM_THREADS=1
     scil_resample_volume.py $t2w ${sid}__t2w_resampled.nii.gz\
         --voxel_size $params.t2w_resolution --interp $params.t2w_interpolation -f
-    scil_resample_volume.py $brain_mask ${sid}__brain_mask_resampled.nii.gz\
-        --voxel_size $params.t2w_resolution --interp $params.mask_interpolation\
-        -f
-    scil_image_math.py convert ${sid}__brain_mask_resampled.nii.gz ${sid}__brain_mask_resampled.nii.gz\
-        --data_type uint8 -f
     scil_resample_volume.py $wm_mask ${sid}__wm_mask_resampled.nii.gz\
         --voxel_size $params.t2w_resolution --interp $params.mask_interpolation\
         -f

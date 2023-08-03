@@ -9,11 +9,11 @@ include {
 
 workflow TRACKING {
     take:
-        brain_wm_mask_channel
+        t2_and_mask_channel
         fodf_channel
         fa_channel
     main:
-        masks_channel = brain_wm_mask_channel
+        masks_channel = t2_and_mask_channel
             .combine(fa_channel, by: 0)
         
         GENERATE_MASKS(masks_channel)

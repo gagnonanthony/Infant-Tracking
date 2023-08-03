@@ -24,16 +24,14 @@ workflow get_data_tracking {
             log.info "                               |   ├-- *bval"
             log.info "                               |   ├-- *bvec"
             log.info "                               |   ├-- *revb0.nii.gz"
-            log.info "                               |   ├-- *T2w.nii.gz"
-            log.info "                               |   ├-- *brain_mask.nii.gz"
+            log.info "                               |   ├-- *t2w.nii.gz"
             log.info "                               |   └-- *wm_mask.nii.gz"
             log.info "                               └-- S2"
             log.info "                                    ├-- *dwi.nii.gz"
             log.info "                                    ├-- *bval"
             log.info "                                    ├-- *bvec"
             log.info "                                    ├-- *revb0.nii.gz"
-            log.info "                                    ├-- *T2w.nii.gz"
-            log.info "                                    ├-- *brain_mask.nii.gz"
+            log.info "                                    ├-- *t2w.nii.gz"
             log.info "                                    └-- *wm_mask.nii.gz"
             error "Please resubmit your command with the previous file structure."
         }
@@ -47,8 +45,6 @@ workflow get_data_tracking {
             { fetch_id(it.parent, input) }
         anat_channel = Channel.fromFilePairs("$input/**/*t2w.nii.gz", size: 1, flat: true)
             { fetch_id(it.parent, input) }
-        brain_mask_channel = Channel.fromFilePairs("$input/**/*brain_mask.nii.gz", size: 1, flat: true)
-            { fetch_id(it.parent, input) }
         wm_mask_channel = Channel.fromFilePairs("$input/**/*wm_mask.nii.gz", size: 1, flat: true)
             { fetch_id(it.parent, input) }
 
@@ -59,7 +55,6 @@ workflow get_data_tracking {
         dwi = dwi_channel
         rev = rev_channel
         anat = anat_channel
-        brain_mask = brain_mask_channel
         wm_mask = wm_mask_channel
 }
 
@@ -80,8 +75,7 @@ workflow get_data_connectomics {
             log.info "                                |   ├-- *peaks.nii.gz"          
             log.info "                                |   ├-- *fodf.nii.gz"            
             log.info "                                |   ├-- OGenericAffine.mat"     
-            log.info "                                |   ├-- synoutput0Warp.nii.gz"  
-            log.info "                                |   ├-- maskoutput0Warp.nii.gz" 
+            log.info "                                |   ├-- output1Warp.nii.gz"  
             log.info "                                |   └-- metrics"
             log.info "                                |       └-- METRIC_NAME.nii.gz  [Optional]"
             log.info "                                └-- S2"
@@ -94,8 +88,7 @@ workflow get_data_connectomics {
             log.info "                                    ├-- *peaks.nii.gz"       
             log.info "                                    ├-- *fodf.nii.gz"         
             log.info "                                    ├-- OGenericAffine.mat"   
-            log.info "                                    ├-- synoutput0Warp.nii.gz"  
-            log.info "                                    ├-- maskoutput0Warp.nii.gz" 
+            log.info "                                    ├-- output1Warp.nii.gz"  
             log.info "                                    └-- metrics"
             log.info "                                        └-- METRIC_NAME.nii.gz  [Optional]"
             error "Please resubmit your command with the previous file structure."
@@ -116,14 +109,14 @@ workflow get_data_connectomics {
             { it.parent.parent.name }
         t2w_channel = Channel.fromFilePairs("$input/**/*t2w_warped.nii.gz", size: 1, flat: true)
             { fetch_id(it.parent, input) }
-        transfos_channel = Channel.fromFilePairs("$input/**/{0GenericAffine.mat,synoutput0Warp.nii.gz,maskoutput0Warp.nii.gz}", size: 3, flat: true)
+        transfos_channel = Channel.fromFilePairs("$input/**/{0GenericAffine.mat,output1Warp.nii.gz}", size: 2, flat: true)
             { fetch_id(it.parent, input) }
 
         // Setting up dwi channel in this order : sid, dwi, bval, bvec for lisibility.
         dwi_peaks_channel = dwi_peaks_channel.map{sid, bvals, bvecs, dwi, peaks -> tuple(sid, dwi, bvals, bvecs, peaks)}
 
         // Setting up transfos channel in this order : sid, affine, syn, masksyn
-        transfos_channel = transfos_channel.map{sid, affine, masksyn, syn -> tuple(sid, affine, syn, masksyn)}
+        // transfos_channel = transfos_channel.map{sid, affine, masksyn, syn -> tuple(sid, affine, syn, masksyn)}
 
         // Flattening metrics channel.
         metrics_channel = metrics_channel.transpose().groupTuple()

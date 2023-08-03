@@ -22,7 +22,6 @@ workflow PREPROCESSING {
         dwi_channel
         rev_channel
         anat_channel
-        brain_mask_channel
         wm_mask_channel
 
     main:
@@ -64,7 +63,6 @@ workflow PREPROCESSING {
         }
 
         anat_crop_channel = anat_crop_channel
-            .combine(brain_mask_channel, by: 0)
             .combine(wm_mask_channel, by:0)        
 
         CROP_ANAT(anat_crop_channel)

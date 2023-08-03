@@ -27,7 +27,6 @@ workflow {
             PREPROCESSING(data.dwi, 
                           data.rev, 
                           data.anat, 
-                          data.brain_mask, 
                           data.wm_mask)
             
             DTI(PREPROCESSING.out.dwi_bval_bvec,
@@ -37,12 +36,11 @@ workflow {
                 SH(PREPROCESSING.out.dwi_bval_bvec)
             }
 
-            fa_channel = DTI.out.fa_and_md
-                .map{[it[0], it[1]]}
+            md_channel = DTI.out.fa_and_md
+                .map{ [it[0], it[2]]}
 
-            REGISTRATION(PREPROCESSING.out.dwi_bval_bvec,
-                        PREPROCESSING.out.t2w_and_mask,
-                        fa_channel)
+            REGISTRATION(md_channel,
+                        PREPROCESSING.out.t2w_and_mask)
             
             b0_mask_channel = PREPROCESSING.out.b0_and_mask
                 .map{[it[0], it[2]]}
@@ -50,11 +48,11 @@ workflow {
             FODF(PREPROCESSING.out.dwi_bval_bvec,
                 b0_mask_channel,
                 DTI.out.fa_and_md)
-            
-            masks_channel = REGISTRATION.out.warped_anat
-                .map{[it[0], it[2], it[3]]}
 
-            TRACKING(masks_channel,
+            fa_channel = DTI.out.fa_and_md
+                .map{[it[0], it[1]]}
+
+            TRACKING(REGISTRATION.out.warped_anat,
                     FODF.out.fodf,
                     fa_channel)
         }
@@ -166,7 +164,7 @@ def display_usage () {
                 "sfthres":"$params.sfthres",
                 "min_len":"$params.min_len",
                 "max_len":"$params.max_len",
-                "use_brain_mask_as_tracking_mask":"$params.use_brain_mask_as_tracking_mask",
+                "erosion":"$params.erosion",
                 "compress_value":"$params.compress_value",
                 "output_dir":"$params.output_dir",
                 "processes_denoise_dwi":"$params.processes_denoise_dwi",
@@ -285,6 +283,7 @@ def display_run_info () {
         log.info ""
         log.info "SEEDING AND TRACKING OPTIONS"
         log.info "FA threshold for seeding mask: $params.fa_seeding_mask_thr"
+        log.info "Erosion value to apply on brain mask: $params.erosion"
         log.info "Algorithm for tracking: $params.algo"
         log.info "Number of seeds per voxel: $params.nb_seeds"
         log.info "Seeding method: $params.seeding"
@@ -294,7 +293,6 @@ def display_run_info () {
         log.info "Minimum fiber length: $params.min_len"
         log.info "Maximum fiber length: $params.max_len"
         log.info "Random tracking seed: $params.tracking_seed"
-        log.info "Use brain mask for tracking: $params.use_brain_mask_as_tracking_mask"
         log.info "Compression value: $params.compress_value"
         log.info ""
         log.info "PROCESSES PER TASKS"
