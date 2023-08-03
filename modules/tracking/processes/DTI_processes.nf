@@ -46,6 +46,8 @@ process DTI_METRICS {
         tuple val(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz"), emit: fa_and_md
         tuple val(sid),
         path("${sid}__ad.nii.gz"),
+        path("${sid}__rd.nii.gz"), emit: ad_and_rd
+        tuple val(sid),
         path("${sid}__evecs.nii.gz"),
         path("${sid}__evecs_v1.nii.gz"),
         path("${sid}__evecs_v2.nii.gz"),
@@ -58,7 +60,6 @@ process DTI_METRICS {
         path("${sid}__rgb.nii.gz"),
         path("${sid}__mode.nii.gz"),
         path("${sid}__norm.nii.gz"),
-        path("${sid}__rd.nii.gz"),
         path("${sid}__tensor.nii.gz"),
         path("${sid}__nonphysical.nii.gz"),
         path("${sid}__pulsation_std_dwi.nii.gz"),

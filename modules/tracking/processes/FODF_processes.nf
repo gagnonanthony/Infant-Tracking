@@ -96,13 +96,14 @@ process FODF_METRICS {
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa), path(md), path(frf)
     output:
         tuple val(sid), path("${sid}__fodf.nii.gz"), emit: fodf
+        tuple val(sid), path("${sid}__peaks.nii.gz"), emit: peaks
         tuple val(sid), 
-        path("${sid}__peaks.nii.gz"),
+        path("${sid}__afd_total.nii.gz"),
+        path("${sid}__nufo.nii.gz"), emit: afd_and_nufo
+        tuple val(sid), 
         path("${sid}__peak_indices.nii.gz"),
         path("${sid}__afd_max.nii.gz"),
-        path("${sid}__afd_total.nii.gz"),
         path("${sid}__afd_sum.nii.gz"),
-        path("${sid}__nufo.nii.gz"),
         path("${sid}__peak_values.nii.gz"),
         path("${sid}__rgb.nii.gz"), emit: fodf_metrics
     script:

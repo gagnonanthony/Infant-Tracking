@@ -1,6 +1,6 @@
-Infant-Tracking
+Infant-DWI
 ===============
-Complete pipeline to perform tractography from infant diffusion MRI data. Adapted from the SCIL TractoFlow Pipeline (https://github.com/scilus/tractoflow.git)
+Complete pipeline to perform tractography from infant diffusion MRI data. Adapted from the SCIL TractoFlow Pipeline (https://github.com/scilus/tractoflow.git) and Connectoflow Pipeline (https://github.com/scilus/connectoflow.git).
 
 SINGULARITY
 -----------
@@ -11,14 +11,14 @@ You can get the image by running this command:
 
 DOCKER
 ------
-If you are on MacOS or Windows, you can use Docker to run Infant-Tracking.
+If you are on MacOS or Windows, you can use Docker to run Infant-DWI.
 Prebuilt image are available here:
 
 https://hub.docker.com/r/scilus/scilus
 
 DEPENDENCIES
 ------------
-You can also run Infant-Tracking without any container, but you need these dependencies installed on your machine to make it work:
+You can also run Infant-DWI without any container, but you need these dependencies installed on your machine to make it work:
 
 * Scilpy (https://github.com/scilus/scilpy.git)
 * Mrtrix3 (https://www.mrtrix.org/)

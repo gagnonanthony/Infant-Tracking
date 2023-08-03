@@ -22,4 +22,6 @@ workflow TRACKING {
             .combine(GENERATE_MASKS.out.masks, by: 0)
         
         LOCAL_TRACKING(tracking_channel)
+    emit:
+        trk = LOCAL_TRACKING.out.tractogram
 }

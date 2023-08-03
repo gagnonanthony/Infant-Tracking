@@ -47,4 +47,6 @@ workflow FODF {
 
     emit:
         fodf = FODF_METRICS.out.fodf
+        peaks = FODF_METRICS.out.peaks
+        afd_and_nufo = FODF_METRICS.out.afd_and_nufo
 }
