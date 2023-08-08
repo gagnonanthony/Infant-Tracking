@@ -21,7 +21,7 @@ process GENERATE_MASKS {
     scil_image_math.py erosion brain_mask.nii.gz $params.erosion ${sid}__brain_mask.nii.gz --data_type uint8 -f
     scil_image_math.py union ${sid}__fa_mask.nii.gz $wm_mask\
         wm_mask_temp.nii.gz --data_type uint8 -f
-    scil_image_math.py intersection wm_mask_temp.nii.gz brain_mask.nii.gz\
+    scil_image_math.py intersection wm_mask_temp.nii.gz ${sid}__brain_mask.nii.gz\
         ${sid}__wm_mask_final.nii.gz --data_type uint8 -f
     """
 }
