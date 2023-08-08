@@ -46,10 +46,10 @@ DESCRIPTION
                                                 [Input]
                                                 ├-- S1
                                                 |   ├-- *dwi.nii.gz             [Required for all profiles]
-                                                |   ├-- *.bval                   [Required for all profiles]
-                                                |   ├-- *.bvec                   [Required for all profiles]
+                                                |   ├-- *.bval                  [Required for all profiles]
+                                                |   ├-- *.bvec                  [Required for all profiles]
                                                 |   ├-- *revb0.nii.gz           [Required only for tracking]
-                                                |   ├-- *t2w_warped.nii.gz             [Required for all profiles]
+                                                |   ├-- *t2w.nii.gz             [Required for all profiles]
                                                 |   ├-- *brain_mask.nii.gz      [Required only for tracking]
                                                 |   ├-- *wm_mask.nii.gz         [Required only for tracking]
                                                 |   ├-- *.trk                   [Required only for connectomics]

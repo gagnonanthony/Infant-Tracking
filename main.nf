@@ -61,6 +61,7 @@ workflow {
             tracking = TRACKING.out.trk
 
             // ** Labels needs to be provided as an input, since they are not computed at some point in the pipeline ** //
+            input = file(params.input)
             labels = Channel.fromFilePairs("$input/**/*labels.nii.gz", size: 1, flat: true)
                         { fetch_id(it.parent, input) }
 
