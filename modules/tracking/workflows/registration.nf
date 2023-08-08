@@ -12,8 +12,8 @@ workflow REGISTRATION {
         t2w_and_mask
     main:
         
-        register_channel = t2w_and_mask
-            .combine(md_channel, by: 0)
+        register_channel = md_channel
+            .combine(t2w_and_mask, by: 0)
 
         REGISTER_ANAT(register_channel)
 
