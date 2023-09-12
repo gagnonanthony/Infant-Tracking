@@ -78,8 +78,7 @@ workflow {
             metrics = provided_metrics
                 .combine(def_metrics, by: 0)
 
-            t2w = PREPROCESSING.out.t2w_and_mask
-                .map{ [it[0], it[1]] }
+            t2w = REGISTRATION.out.warped_anat
 
             transfos = REGISTRATION.out.transfos
 
