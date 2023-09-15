@@ -36,11 +36,9 @@ workflow {
                 SH(PREPROCESSING.out.dwi_bval_bvec)
             }
 
-            md_channel = DTI.out.fa_and_md
-                .map{ [it[0], it[2]]}
-
-            REGISTRATION(md_channel,
-                        PREPROCESSING.out.t2w_and_mask)
+            REGISTRATION(DTI.out.fa_and_md,
+                        PREPROCESSING.out.t2w_and_mask,
+                        PREPROCESSING.out.b0_and_mask.map{ [it[0], it[1]] })
             
             b0_mask_channel = PREPROCESSING.out.b0_and_mask
                 .map{[it[0], it[2]]}
@@ -75,10 +73,15 @@ workflow {
             def_metrics = DTI.out.fa_and_md
                 .combine(DTI.out.ad_and_rd, by: 0)
                 .combine(FODF.out.afd_and_nufo, by: 0)
-            metrics = provided_metrics
-                .combine(def_metrics, by: 0)
+            metrics = def_metrics
+                .combine(provided_metrics, by: 0)
+
+            // ** Flattening metrics channel ** //
+            metrics = metrics.transpose().groupTuple()
+                        .flatMap{ sid, metrics -> metrics.collect{ [sid, it] } }
 
             t2w = REGISTRATION.out.warped_anat
+                        .map{ [it[0], it[1]] }
 
             transfos = REGISTRATION.out.transfos
 
@@ -120,8 +123,8 @@ def display_usage () {
     bindings = ["b0_thr":"$params.b0_thr",
                 "initial_bet_f":"$params.initial_bet_f",
                 "final_bet_f":"$params.final_bet_f",
-                "run_bet_t2w":"$params.run_bet_t2w",
-                "bet_t2w_f":"$params.bet_t2w_f",
+                "run_bet_anat":"$params.run_bet_anat",
+                "bet_anat_f":"$params.bet_anat_f",
                 "topup_config":"$params.topup_config",
                 "encoding_direction":"$params.encoding_direction",
                 "readout":"$params.readout",
@@ -131,17 +134,18 @@ def display_usage () {
                 "use_slice_drop_correction":"$params.use_slice_drop_correction",
                 "dwi_shell_tolerance":"$params.dwi_shell_tolerance",
                 "fa_mask_threshold":"$params.fa_mask_threshold",
-                "t2w_resolution":"$params.t2w_resolution",
-                "t2w_interpolation":"$params.t2w_interpolation",
+                "anat_resolution":"$params.anat_resolution",
+                "anat_interpolation":"$params.anat_interpolation",
                 "mask_interpolation":"$params.mask_interpolation",
+                "template_t1":"$params.template_t1",
                 "dwi_resolution":"$params.dwi_resolution",
                 "dwi_interpolation":"$params.dwi_interpolation",
-                "mask_dwi_interpolation":"$params.mask_dwi_interpolation",
                 "max_dti_shell_value":"$params.max_dti_shell_value",
                 "sh_fitting":"$params.sh_fitting",
                 "sh_fitting_order":"$params.sh_fitting_order",
                 "sh_fitting_basis":"$params.sh_fitting_basis",
                 "min_fodf_shell_value":"$params.min_fodf_shell_value",
+                "fodf_metrics_a_facotr":"$params.fodf_metrics_a_factor",
                 "max_fa_in_ventricle":"$params.max_fa_in_ventricle",
                 "min_md_in_ventricle":"$params.min_md_in_ventricle",
                 "relative_threshold":"$params.relative_threshold",
@@ -154,20 +158,46 @@ def display_usage () {
                 "roi_radius":"$params.roi_radius",
                 "set_frf":"$params.set_frf",
                 "manual_frf":"$params.manual_frf",
-                "fa_seeding_mask_thr":"$params.fa_seeding_mask_thr",
-                "algo":"$params.algo",
-                "seeding":"$params.seeding",
-                "nb_seeds":"$params.nb_seeds",
-                "tracking_seed":"$params.tracking_seed",
-                "step_size":"$params.step_size",
-                "theta":"$params.theta",
-                "sfthres":"$params.sfthres",
-                "min_len":"$params.min_len",
-                "max_len":"$params.max_len",
-                "erosion":"$params.erosion",
-                "compress_value":"$params.compress_value",
+                "run_pft_tracking":"$params.run_pft_tracking",
+                "pft_compress_streamlines":"$params.pft_compress_streamlines",
+                "pft_seeding_mask_type":"$params.pft_seeding_mask_type",
+                "pft_fa_seeding_mask_thr":"$params.pft_fa_seeding_mask_thr",
+                "pft_algo":"$params.pft_algo",
+                "pft_nb_seeds":"$params.pft_nb_seeds",
+                "pft_seeding":"$params.pft_seeding",
+                "pft_step_size":"$params.pft_step_size",
+                "pft_theta":"$params.pft_theta",
+                "pft_sfthres":"$params.pft_sfthres",
+                "pft_sfthres_init":"$params.pft_sfthres_init",
+                "pft_min_len":"$params.pft_min_len",
+                "pft_max_len":"$params.pft_max_len",
+                "pft_particles":"$params.pft_particles",
+                "pft_back":"$params.pft_back",
+                "pft_front":"$params.pft_front",
+                "pft_compress_value":"$params.pft_compress_value",
+                "pft_random_seed":"$params.pft_random_seed",
+                "run_local_tracking":"$params.run_local_tracking",
+                "local_compress_streamlines":"$params.local_compress_streamlines",
+                "local_fa_seeding_mask_thr":"$params.local_fa_seeding_mask_thr",
+                "local_seeding_mask_type":"$params.local_seeding_mask_type",
+                "local_fa_tracking_mask_thr":"$params.local_fa_tracking_mask_thr",
+                "local_tracking_mask_type":"$params.local_tracking_mask_type",
+                "local_algo":"$params.local_algo",
+                "local_seeding":"$params.local_seeding",
+                "local_nb_seeds":"$params.local_nb_seeds",
+                "local_tracking_seed":"$params.local_tracking_seed",
+                "local_step_size":"$params.local_step_size",
+                "local_theta":"$params.local_theta",
+                "local_sfthres":"$params.local_sfthres",
+                "local_sfthres_init":"$params.local_sfthres_init",
+                "local_min_len":"$params.local_min_len",
+                "local_max_len":"$params.local_max_len",
+                "local_erosion":"$params.local_erosion",
+                "local_compress_value":"$params.local_compress_value",
                 "output_dir":"$params.output_dir",
                 "processes_denoise_dwi":"$params.processes_denoise_dwi",
+                "processes_denoise_t1":"$params.processes_denoise_t1",
+                "processes_bet_t1":"$params.processes_bet_t1",
                 "processes_eddy":"$params.processes_eddy",
                 "processes_registration":"$params.processes_registration",
                 "processes_fodf":"$params.processes_fodf",
@@ -178,8 +208,13 @@ def display_usage () {
                 "max_length":"$params.max_length",
                 "loop_max_angle":"$params.loop_max_angle",
                 "outlier_threshold":"$params.outlier_threshold",
+                "run_commit":"$params.run_commit",
+                "use_commit2":"$params.use_commit2",
+                "b_thr":"$params.b_thr",
+                "ball_stick":"$params.ball_stick",
                 "nbr_dir":"$params.nbr_dir",
                 "para_diff":"$params.para_diff",
+                "perp_diff":"$params.perp_diff",
                 "iso_diff":"$params.iso_diff",
                 "processes_commit":"$params.processes_commit",
                 "processes_afd_fixel":"$params.processes_afd_fixel",
@@ -231,8 +266,8 @@ def display_run_info () {
         log.info "Finale fractional value for BET: $params.final_bet_f"
         log.info ""
         log.info "BET T2W OPTIONS"
-        log.info "Run BET on T2W image: $params.run_bet_t2w"
-        log.info "Fractional value for T2W BET: $params.bet_t2w_f"
+        log.info "Run BET on T2W image: $params.run_bet_anat"
+        log.info "Fractional value for T2W BET: $params.bet_anat_f"
         log.info ""
         log.info "EDDY AND TOPUP OPTIONS"
         log.info "Configuration for topup: $params.topup_config"
@@ -247,8 +282,8 @@ def display_run_info () {
         log.info "FA threshold for masking: $params.fa_mask_threshold"
         log.info ""
         log.info "RESAMPLE ANAT OPTIONS"
-        log.info "Resampling resolution for T2W: $params.t2w_resolution"
-        log.info "Interpolation method for T2W: $params.t2w_interpolation"
+        log.info "Resampling resolution for Anatomical file: $params.anat_resolution"
+        log.info "Interpolation method for Anatomical file: $params.anat_interpolation"
         log.info "Interpolation method for masks: $params.mask_interpolation"
         log.info ""
         log.info "RESAMPLE DWI OPTIONS"
@@ -282,18 +317,30 @@ def display_run_info () {
         log.info "Manual FRF: $params.manual_frf"
         log.info ""
         log.info "SEEDING AND TRACKING OPTIONS"
-        log.info "FA threshold for seeding mask: $params.fa_seeding_mask_thr"
-        log.info "Erosion value to apply on brain mask: $params.erosion"
-        log.info "Algorithm for tracking: $params.algo"
-        log.info "Number of seeds per voxel: $params.nb_seeds"
-        log.info "Seeding method: $params.seeding"
-        log.info "Step size: $params.step_size"
-        log.info "Theta threshold: $params.theta"
-        log.info "Spherical function relative threshold: $params.sfthres"
-        log.info "Minimum fiber length: $params.min_len"
-        log.info "Maximum fiber length: $params.max_len"
-        log.info "Random tracking seed: $params.tracking_seed"
-        log.info "Compression value: $params.compress_value"
+        log.info "Local tracking : $params.run_local_tracking"
+        log.info "PFT tracking: $params.run_pft_tracking"
+
+        if ( params.run_pft_tracking ) {
+            log.info "Algorithm for tracking: $params.pft_algo"
+            log.info "Number of seeds per voxel: $params.pft_nb_seeds"
+            log.info "Seeding method: $params.pft_seeding"
+            log.info "Step size: $params.pft_step_size"
+            log.info "Theta threshold: $params.pft_theta"
+            log.info "Minimum fiber length: $params.pft_min_len"
+            log.info "Maximum fiber length: $params.pft_max_len"
+            log.info "Compression: $params.pft_compress_streamlines"
+        }
+        else {
+            log.info "Algorithm for tracking: $params.local_algo"
+            log.info "Number of seeds per voxel: $params.local_nb_seeds"
+            log.info "Seeding method: $params.local_seeding"
+            log.info "Step size: $params.local_step_size"
+            log.info "Theta threshold: $params.local_theta"
+            log.info "Minimum fiber length: $params.local_min_len"
+            log.info "Maximum fiber length: $params.local_max_len"
+            log.info "Compression: $params.local_compress_streamlines"
+        }
+
         log.info ""
         log.info "PROCESSES PER TASKS"
         log.info "Processes for denoising DWI: $params.processes_denoise_dwi"

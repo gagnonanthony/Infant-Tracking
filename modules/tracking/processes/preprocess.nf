@@ -45,7 +45,7 @@ process BET_T2 {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    bet2 $anat ${sid}__t2w_bet.nii.gz -f $params.bet_t2w_f
+    bet2 $anat ${sid}__t2w_bet.nii.gz -f $params.bet_anat_f
     """
 }
 
@@ -182,6 +182,49 @@ process CROP_DWI {
     """
 }
 
+process DENOISE_T1 {
+    label "DENOISE_T1"
+    cpus params.processes_denoise_t1
+
+    input:
+        tuple val(sid), path(t1)
+    output:
+        tuple val(sid), path("${sid}__t1_denoised.nii.gz"), emit: t1_denoised
+    when:
+        !params.infant_config
+    
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_run_nlmeans.py $t1 ${sid}__t1_denoised.nii.gz 1\
+        --processes $task.cpus -f
+    """
+}
+
+process N4_T1 {
+    label "N4_T1"
+    cpus 1
+
+    input:
+        tuple val(sid), path(t1)
+    output:
+        tuple val(sid), path("${sid}__t1_n4.nii.gz"), emit: t1_n4
+    when:
+        !params.infant_config
+    
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    N4BiasFieldCorrection -i $t1\
+        -o [${sid}__t1_n4.nii.gz, bias_field_t1.nii.gz]\
+        -c [300x150x75x50, 1e-6] -v 1
+    """
+}
+
 process CROP_ANAT {
     label "CROP_VOLUMES"
     cpus 1
@@ -202,25 +245,73 @@ process CROP_ANAT {
     """
 }
 
+process RESAMPLE_T1 {
+    label "RESAMPLE_T1"
+    cpus 1
+
+    input:
+        tuple val(sid), path(t1)
+    output:
+        tuple val(sid), path("${sid}__t1_resampled.nii.gz"), emit: t1_resampled
+    when:
+        !params.infant_config
+
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_resample_volume.py $t1 ${sid}__t1_resampled.nii.gz\
+        --voxel_size $params.anat_resolution \
+        --interp $params.anat_interpolation
+    """
+}
+
+process BET_T1 {
+    label "BET_T1"
+    cpus params.processes_bet_t1
+
+    input:
+        tuple val(sid), path(t1)
+    output:
+        tuple val(sid), path("${sid}__t1_bet.nii.gz"), 
+        path("${sid}__t1_bet_mask.nii.gz"), emit: t1_and_mask_bet
+    when:
+        !params.infant_config
+    
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    export ANTS_RANDOM_SEED=1234
+    antsBrainExtraction.sh -d 3 -a $t1 -e $params.template_t1/t1_template.nii.gz\
+        -o bet/ -m $params.template_t1/t1_brain_probability_map.nii.gz -u 0
+    scil_image_math.py convert bet/BrainExtractionMask.nii.gz ${sid}__t1_bet_mask.nii.gz\
+        --data_type uint8
+    mrcalc $t1 ${sid}__t1_bet_mask.nii.gz -mult ${sid}__t1_bet.nii.gz -nthreads 1
+    """
+}
+
 process RESAMPLE_ANAT {
     label "RESAMPLE_VOLUMES"
     cpus 1
 
     input:
-        tuple val(sid), path(t2w), path(wm_mask)
+        tuple val(sid), path(t2w), path(mask)
     output:
-        tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__wm_mask_resampled.nii.gz"), emit: t2w_and_mask
+        tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__mask_resampled.nii.gz"), emit: t2w_and_mask
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     scil_resample_volume.py $t2w ${sid}__t2w_resampled.nii.gz\
-        --voxel_size $params.t2w_resolution --interp $params.t2w_interpolation -f
-    scil_resample_volume.py $wm_mask ${sid}__wm_mask_resampled.nii.gz\
-        --voxel_size $params.t2w_resolution --interp $params.mask_interpolation\
+        --voxel_size $params.anat_resolution --interp $params.anat_interpolation -f
+    scil_resample_volume.py $mask ${sid}__mask_resampled.nii.gz\
+        --voxel_size $params.anat_resolution --interp $params.mask_interpolation\
         -f
-    scil_image_math.py convert ${sid}__wm_mask_resampled.nii.gz ${sid}__wm_mask_resampled.nii.gz\
+    scil_image_math.py convert ${sid}__mask_resampled.nii.gz ${sid}__mask_resampled.nii.gz\
         --data_type uint8 -f
     """
 }

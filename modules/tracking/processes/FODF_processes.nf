@@ -119,7 +119,7 @@ process FODF_METRICS {
         --fa_t $params.max_fa_in_ventricle --md_t $params.min_md_in_ventricle\
         -f
     
-    a_threshold=\$( echo " 2 * `awk '{for(i=1;i<=NF;i++) if(\$i>maxval) maxval=\$i;}; END { print maxval;}' ventricles_fodf_max_value.txt`" | bc )
+    a_threshold=\$( echo " $params.fodf_metrics_a_factor * `awk '{for(i=1;i<=NF;i++) if(\$i>maxval) maxval=\$i;}; END { print maxval;}' ventricles_fodf_max_value.txt`" | bc )
 
     scil_compute_fodf_metrics.py ${sid}__fodf.nii.gz --mask $b0_mask --sh_basis $params.basis\
         --peaks ${sid}__peaks.nii.gz --peak_indices ${sid}__peak_indices.nii.gz\

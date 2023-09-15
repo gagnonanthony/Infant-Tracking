@@ -2,6 +2,34 @@
 
 nextflow.enable.dsl=2
 
+process SEGMENT_TISSUES {
+    label "SEGMENTATION"
+    cpus 1
+
+    input:
+        tuple val(sid), path(anat)
+    output:
+        tuple val(sid), path("${sid}__map_wm.nii.gz"), path("${sid}__map_gm.nii.gz"),
+        path("${sid}__map_csf.nii.gz"), emit: maps
+        tuple val(sid), path("${sid}__mask_wm.nii.gz"), path("${sid}__mask_gm.nii.gz"),
+        path("${sid}__mask_csf.nii.gz"), emit: masks
+
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    fast -t 1 -n $params.number_of_tissues\
+        -H 0.1 -I 4 -l 20.0 -g -o anat.nii.gz $anat
+    scil_image_math.py convert anat_seg_2.nii.gz ${sid}__mask_wm.nii.gz --data_type uint8
+    scil_image_math.py convert anat_seg_1.nii.gz ${sid}__mask_gm.nii.gz --data_type uint8
+    scil_image_math.py convert anat_seg_0.nii.gz ${sid}__mask_csf.nii.gz --data_type uint8
+    mv anat_pve_2.nii.gz ${sid}__map_wm.nii.gz
+    mv anat_pve_1.nii.gz ${sid}__map_gm.nii.gz
+    mv anat_pve_0.nii.gz ${sid}__map_csf.nii.gz
+    """    
+}
+
 process GENERATE_MASKS {
     label "GENERATE_MASKS"
     cpus 1
@@ -9,40 +37,187 @@ process GENERATE_MASKS {
     input:
         tuple val(sid), path(t2w), path(wm_mask), path(fa)
     output:
-        tuple val(sid), path("${sid}__wm_mask_final.nii.gz"),
-        path("${sid}__brain_mask.nii.gz"), emit: masks
+        tuple val(sid), path("${sid}__seeding_mask.nii.gz"),
+        path("${sid}__tracking_mask.nii.gz"), emit: masks
+        tuple val(sid), path("${sid}__fa_mask.nii.gz")
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    mrthreshold $fa ${sid}__fa_mask.nii.gz -abs $params.fa_seeding_mask_thr -nthreads 1 -force
-    scil_image_math.py lower_threshold $t2w 0 brain_mask.nii.gz --data_type uint8
-    scil_image_math.py erosion brain_mask.nii.gz $params.erosion ${sid}__brain_mask.nii.gz --data_type uint8 -f
+    bet2 $fa fa_bet -m -f 0.16
+    scil_image_math.py erosion fa_bet_mask.nii.gz $params.erosion fa_bet_mask.nii.gz -f
+    mrcalc fa_bet.nii.gz fa_bet_mask.nii.gz -mult fa_eroded.nii.gz
+    mrthreshold fa_eroded.nii.gz ${sid}__fa_mask.nii.gz -abs $params.fa_seeding_mask_thr -nthreads 1 -force
     scil_image_math.py union ${sid}__fa_mask.nii.gz $wm_mask\
-        wm_mask_temp.nii.gz --data_type uint8 -f
-    scil_image_math.py intersection wm_mask_temp.nii.gz ${sid}__brain_mask.nii.gz\
-        ${sid}__wm_mask_final.nii.gz --data_type uint8 -f
+        ${sid}__seeding_mask.nii.gz --data_type uint8 -f
+    cp ${sid}__seeding_mask.nii.gz ${sid}__tracking_mask.nii.gz
     """
 }
 
+process LOCAL_TRACKING_MASK {
+    label "LOCAL_TRACKING"
+    cpus 1
+
+    input:
+        tuple val(sid), path(wm), path(fa)
+    output:
+        tuple val(sid), path("${sid}__local_tracking_mask.nii.gz"), emit: tracking_mask
+    when:
+        params.run_local_tracking
+    
+    script:
+    if (params.local_tracking_mask_type == "wm")
+        """
+        mv $wm ${sid}__local_tracking_mask.nii.gz
+        """
+    else if (params.local_tracking_mask_type == "fa")
+        """
+        export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+        export OMP_NUM_THREADS=1
+        export OPENBLAS_NUM_THREADS=1
+        mrcalc $fa $params.local_fa_tracking_mask_threshold -ge ${sid}__local_tracking_mask.nii.gz\
+            -datatype uint8
+        """
+}
+
+process LOCAL_SEEDING_MASK {
+    label "LOCAL_TRACKING"
+    cpus 1
+
+    input:
+        tuple val(sid), path(wm), path(fa)
+    output:
+        tuple val(sid), path("${sid}__local_seeding_mask.nii.gz"), emit: seeding_mask
+    when:
+        params.run_local_tracking
+    
+    script:
+    if (params.local_seeding_mask_type == "wm")
+        """
+        mv $wm ${sid}__local_seeding_mask.nii.gz
+        """
+    else if (params.local_seeding_mask_type == "fa")
+        """
+        export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+        export OMP_NUM_THREADS=1
+        export OPENBLAS_NUM_THREADS=1
+        mrcalc $fa $params.local_fa_seeding_mask_threshold -ge ${sid}__local_seeding_mask.nii.gz\
+            -datatype uint8
+        """
+}
+
 process LOCAL_TRACKING {
-    label "TRACKING"
+    label "LOCAL_TRACKING"
     cpus 2
 
     input:
-        tuple val(sid), path(fodf), path(wm_mask), path(brain_mask)
+        tuple val(sid), path(fodf), path(seeding_mask), path(tracking_mask)
     output:
         tuple val(sid), path("${sid}__local_tracking.trk"), emit: tractogram
+    when:
+        params.run_local_tracking
+
     script:
+    compress = params.local_compress_streamlines ? '--compress ' + params.local_compress_value : ''
     """
-    scil_compute_local_tracking.py $fodf $wm_mask $wm_mask\
-        tmp.trk --algo $params.algo --$params.seeding $params.nb_seeds\
-        --seed $params.tracking_seed --step $params.step_size --theta $params.theta\
-        --sfthres $params.sfthres --min_length $params.min_len\
-        --max_length $params.max_len --sh_basis $params.sh_fitting_basis\
-        --compress $params.compress_value
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_compute_local_tracking.py $fodf $seeding_mask $tracking_mask\
+        tmp.trk --algo $params.local_algo --$params.local_seeding $params.local_nb_seeds\
+        --seed $params.local_tracking_seed --step $params.local_step_size --theta $params.local_theta\
+        --sfthres $params.local_sfthres --min_length $params.local_min_len\
+        --max_length $params.local_max_len $compress --sh_basis $params.local_sh_fitting_basis\
     scil_remove_invalid_streamlines.py tmp.trk\
         ${sid}__local_tracking.trk --remove_single_point
+    """
+}
+
+process PFT_SEEDING_MASK {
+    label "PFT_TRACKING"
+    cpus 1
+
+    input:
+        tuple val(sid), path(wm), path(fa), path(interface_mask)
+    output:
+        tuple val(sid), path("${sid}__pft_seeding_mask.nii.gz"), emit: seeding_mask
+    when:
+        params.run_pft_tracking
+    
+    script:
+    if (params.pft_seeding_mask_type == "wm")
+        """    
+        export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+        export OMP_NUM_THREADS=1
+        export OPENBLAS_NUM_THREADS=1
+        scil_image_math.py union $wm, $interface_mask ${sid}__pft_seeding_mask.nii.gz\
+            --data_type uint8
+        """
+    else if (params.pft_seeding_mask_type == "interface")
+        """
+        mv $interface_mask ${sid}__pft_seeding_mask.nii.gz
+        """
+    else if (params.pft_seeding_mask_type == "fa")
+        """
+        export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+        export OMP_NUM_THREADS=1
+        export OPENBLAS_NUM_THREADS=1
+        mrcalc $fa $params.pft_fa_seeding_mask_threshold -ge ${sid}__pft_seeding_mask.nii.gz\
+            -datatype uint8
+        """
+}
+
+process PFT_TRACKING_MASK {
+    label "PFT_TRACKING"
+    cpus 1
+
+    input:
+        tuple val(sid), path(wm), path(gm), path(csf)
+    output:
+        tuple val(sid), path("${sid}__map_include.nii.gz"), path("${sid}__map_exclude.nii.gz"), emit: tracking_maps
+        tuple val(sid), path("${sid}__interface.nii.gz"), emit: interface_map
+    when:
+        params.run_pft_tracking
+
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_compute_maps_for_particle_filter_tracking.py $wm $gm $csf\
+        --include ${sid}__map_include.nii.gz\
+        --exclude ${sid}__map_exclude.nii.gz\
+        --interface ${sid}__interface.nii.gz -f
+    """
+}
+
+process PFT_TRACKING {
+    label "PFT_TRACKING"
+    cpus 2
+
+    input:
+        tuple val(sid), path(fodf), path(include), path(exclude), path(seed)
+    output:
+        tuple val(sid), path("${sid}__pft_tracking.trk"), emit: tractogram
+    when:
+        params.run_pft_tracking
+
+    script:
+    compress = params.pft_compress_streamlines ? '--compress ' + params.pft_compress_value : ''
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_compute_pft.py $fodf $seed $include $exclude\
+        tmp.trk\
+        --algo $params.pft_algo --$params.pft_seeding $params.pft_nbr_seeds\
+        --seed $curr_seed --step $params.step_size --theta $params.theta\
+        --sfthres $params.pft_sfthres --sfthres_init $params.pft_sfthres_init\
+        --min_length $params.pft_min_len --max_length $params.pft_max_len\
+        --particles $params.pft_particles --back $params.pft_back\
+        --forward $params.pft_front $compress --sh_basis $params.basis
+    scil_remove_invalid_streamlines.py tmp.trk\
+        ${sid}__pft_tracking.trk --remove_single_point
     """
 }

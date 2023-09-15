@@ -57,7 +57,7 @@ workflow PREPROCESSING {
 
         anat_crop_channel = anat_channel
 
-        if (params.run_bet_t2w) {
+        if (params.run_bet_anat) {
             BET_T2(anat_channel)
             anat_crop_channel = BET_T2.out.bet_t2
         }

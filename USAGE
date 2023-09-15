@@ -94,11 +94,11 @@ OPTIONAL ARGUMENTS (current value)
     --final_bet_f                               Fractional intensity threshold for final bet. ($final_bet_f)
     
     BET T2 OPTIONS
-    --run_bet_t2w                               If set, will perform brain extraction on the input T2w volume. ($run_bet_t2w)
+    --run_bet_anat                              If set, will perform brain extraction on the input T2w volume. ($run_bet_anat)
                                                 Default settings are soft to make sure an already brain extracted volume is not impacted 
                                                 by the bet command. The goal is to clean volumes that still have portions of non-brain 
                                                 structures.
-    --bet_t2w_f                                 Fractional intensity threshold for bet. ($bet_t2w_f)
+    --bet_anat_f                                Fractional intensity threshold for bet. ($bet_anat_f)
 
     EDDY AND TOPUP OPTIONS
     --encoding_direction                        Encoding direction of the dwi [x, y, z]. ($encoding_direction)
@@ -112,12 +112,11 @@ OPTIONAL ARGUMENTS (current value)
     --fa_mask_threshold                         Threshold to use when creating the fa mask for normalization. ($fa_mask_threshold)
 
     RESAMPLE OPTIONS
-    --t2w_resolution                            Resampling resolution of the T2w image. ($t2w_resolution)
-    --t2w_interpolation                         Interpolation method to use after resampling. ($t2w_interpolation)
+    --anat_resolution                           Resampling resolution of the T2w image. ($anat_resolution)
+    --anat_interpolation                        Interpolation method to use after resampling. ($anat_interpolation)
     --mask_interpolation                        Interpolation method to use on the anatomical masks after resampling. ($mask_interpolation)
     --dwi_resolution                            Resampling resolution of the dwi volume. ($dwi_resolution)
     --dwi_interpolation                         Interpolation method to use after resampling of the dwi volume. ($dwi_interpolation)
-    --mask_dwi_interpolation                    Interpolation method to use on the b0 mask after resampling. ($mask_dwi_interpolation)
 
     DTI OPTIONS
     --max_dti_shell_value                       Maximum b-value threshold to select DTI shells. (b <= $max_dti_shell_value)
@@ -162,20 +161,40 @@ OPTIONAL ARGUMENTS (current value)
     --set_frf                                   If selected, will manually set the frf. ($set_frf)
     --manual_frf                                FRF set manually (--manual_frf "$manual_frf")
     
-    SEEDING AND TRAKING OPTIONS
-    --fa_seeding_mask_thr                       Minimal FA threshold to generate a binary fa mask for seeding and 
-                                                tracking. ($fa_seeding_mask_thr)
-    --erosion                                   Number of voxel to remove from brain mask. Use to remove aberrant
-                                                voxel in fa maps. ($erosion)
-    --algo                                      Tracking algorithm [prob, det]. ($algo)
-    --nb_seeds                                  Number of seeds related to the seeding type param. ($nb_seeds)
-    --seeding                                   Seeding type [npv, nt]. ($seeding)
-    --step_size                                 Step size ($step_size)
-    --theta                                     Maximum angle between 2 steps. ($theta)
-    --min_len                                   Minimum length for a streamline. ($min_len)
-    --max_len                                   Maximum length for a streamline. ($max_len)
-    --compress_value                            Compression error threshold. ($compress_value)                                  
-    --tracking_seed                             List of random seed numbers for the random number generator. ($tracking_seed)
+    LOCAL SEEDING AND TRAKING OPTIONS
+    --run_local_tracking                        If set, local tracking will be performed. ($run_local_tracking)
+    --local_compress_streamlines                If set, will compress streamlines. ($local_compress_streamlines)
+    --local_fa_seeding_mask_thr                 Minimal FA threshold to generate a binary fa mask for seeding.              ($local_fa_seeding_mask_thr)
+    --local_seeding_mask_type                   Seeding mask type [fa, wm]. ($local_seeding_mask_type)
+    --local_fa_tracking_mask_thr                Minimal FA threshold to generate a binary fa mask for tracking. ($local_fa_tracking_mask_thr)
+    --local_tracking_mask_type                  Tracking mask type [fa, wm]. ($local_tracking_mask_type)
+    --local_erosion                             Number of voxel to remove from brain mask. Use to remove aberrant
+                                                voxel in fa maps. ($local_erosion)
+    --local_algo                                Tracking algorithm [prob, det]. ($local_algo)
+    --local_nb_seeds                            Number of seeds related to the seeding type param. ($local_nb_seeds)
+    --local_seeding                             Seeding type [npv, nt]. ($local_seeding)
+    --local_step_size                           Step size ($local_step_size)
+    --local_theta                               Maximum angle between 2 steps. ($local_theta)                         
+    --local_min_len                             Minimum length for a streamline. ($local_min_len)
+    --local_max_len                             Maximum length for a streamline. ($local_max_len)
+    --local_compress_value                      Compression error threshold. ($local_compress_value)                                  
+    --local_tracking_seed                       List of random seed numbers for the random number generator. ($local_tracking_seed)
+                                                Please write them as a list separated by commas without space e.g. (--tracking_seed 1,2,3)
+
+    PFT SEEDING AND TRAKING OPTIONS
+    --run_pft_tracking                          If set, local tracking will be performed. ($run_pft_tracking)
+    --pft_compress_streamlines                  If set, will compress streamlines. ($pft_compress_streamlines)
+    --pft_fa_seeding_mask_thr                   Minimal FA threshold to generate a binary fa mask for seeding.              ($pft_fa_seeding_mask_thr)
+    --pft_seeding_mask_type                     Seeding mask type [fa, wm]. ($pft_seeding_mask_type)
+    --pft_algo                                  Tracking algorithm [prob, det]. ($pft_algo)
+    --pft_nb_seeds                              Number of seeds related to the seeding type param. ($pft_nb_seeds)
+    --pft_seeding                               Seeding type [npv, nt]. ($pft_seeding)
+    --pft_step_size                             Step size ($pft_step_size)
+    --pft_theta                                 Maximum angle between 2 steps. ($pft_theta)                         
+    --pft_min_len                               Minimum length for a streamline. ($pft_min_len)
+    --pft_max_len                               Maximum length for a streamline. ($pft_max_len)
+    --pft_compress_value                        Compression error threshold. ($pft_compress_value)                                  
+    --pft_random_seed                           List of random seed numbers for the random number generator. ($pft_random_seed)
                                                 Please write them as a list separated by commas without space e.g. (--tracking_seed 1,2,3)
 
     PROCESSES OPTIONS
