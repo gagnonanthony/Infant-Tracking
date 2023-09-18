@@ -4,7 +4,8 @@ nextflow.enable.dsl=2
 
 include { TRANSFORM_LABELS } from "../processes/transform_labels.nf"
 include { DECOMPOSE_CONNECTIVITY } from "../processes/decompose.nf"
-include { COMMIT } from "../processes/commit.nf"
+include { COMMIT;
+          COMMIT_ON_TRK } from "../processes/commit.nf"
 include { COMPUTE_AFD_FIXEL;
           COMPUTE_CONNECTIVITY } from "../processes/compute_metrics.nf"
 include { VISUALIZE_CONNECTIVITY } from "../processes/viz.nf"
@@ -31,9 +32,9 @@ workflow CONNECTOMICS {
             commit_channel = tracking_channel
                                 .combine(dwi_peaks_channel, by: 0)
             
-            COMMIT(commit_channel)
+            COMMIT_ON_TRK(commit_channel)
 
-            decompose_channel = COMMIT.out.trk_commit
+            decompose_channel = COMMIT_ON_TRK.out.trk_commit
                                 .combine(TRANSFORM_LABELS.out.labels_warped, by: 0)
             
             DECOMPOSE_CONNECTIVITY(decompose_channel)
