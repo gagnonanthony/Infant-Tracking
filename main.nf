@@ -214,6 +214,7 @@ def display_usage () {
                 "outlier_threshold":"$params.outlier_threshold",
                 "run_commit":"$params.run_commit",
                 "use_commit2":"$params.use_commit2",
+                "commit_on_trk":"$params.commit_on_trk",
                 "b_thr":"$params.b_thr",
                 "ball_stick":"$params.ball_stick",
                 "nbr_dir":"$params.nbr_dir",

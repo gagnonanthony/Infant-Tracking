@@ -30,8 +30,16 @@ process COMMIT {
     scil_run_commit.py $trk_h5 $dwi $bval $bvec "${sid}__results_bzs/" --ball_stick --commit2 --in_peaks $peaks\
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir\
         --para_diff $params.para_diff $perp_diff_arg --iso_diff $params.iso_diff
-    mv "${sid}__results_bzs/commit_2/decompose_commit.h5" ./"${sid}__decompose_commit.h5"
-    mv "${sid}__results_bzs/commit_2/essential_tractogram.trk" ./"${sid}__essential_tractogram.trk"
+    mv "${sid}__results_bzs/commit_2/decompose_commit.h5" "./${sid}__decompose_commit.h5"
+    mv "${sid}__results_bzs/commit_2/essential_tractogram.trk" "./${sid}__essential_tractogram.trk"
+    """
+    }
+    else if ( params.commit_on_trk ) {
+    """
+    scil_run_commit.py $trk_h5 $dwi $bval $bvec "${sid}__results_bzs/" --in_peaks $peaks \
+        --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir $ball_stick_arg \
+        --para_diff $params.para_diff $perp_diff_arg --iso_diff $params.iso_diff
+    mv "${sid}__results_bzs/commit_1/essential_tractogram.trk" "./${sid}__essential_tractogram.trk"
     """
     }
     else {
@@ -39,8 +47,8 @@ process COMMIT {
     scil_run_commit.py $trk_h5 $dwi $bval $bvec "${sid}__results_bzs/" --in_peaks $peaks \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir $ball_stick_arg \
         --para_diff $params.para_diff $perp_diff_arg --iso_diff $params.iso_diff
-    mv "${sid}__results_bzs/commit_1/decompose_commit.h5" ./"${sid}__decompose_commit.h5"
-    mv "${sid}__results_bzs/commit_1/essential_tractogram.trk" ./"${sid}__essential_tractogram.trk"
+    mv "${sid}__results_bzs/commit_1/decompose_commit.h5" "./${sid}__decompose_commit.h5"
+    mv "${sid}__results_bzs/commit_1/essential_tractogram.trk" "./${sid}__essential_tractogram.trk"
     """
     }
 }
