@@ -48,7 +48,7 @@ process GENERATE_MASKS {
     bet2 $fa fa_bet -m -f 0.16
     scil_image_math.py erosion fa_bet_mask.nii.gz $params.erosion fa_bet_mask.nii.gz -f
     mrcalc fa_bet.nii.gz fa_bet_mask.nii.gz -mult fa_eroded.nii.gz
-    mrthreshold fa_eroded.nii.gz ${sid}__fa_mask.nii.gz -abs $params.fa_seeding_mask_thr -nthreads 1 -force
+    mrthreshold fa_eroded.nii.gz ${sid}__fa_mask.nii.gz -abs $params.local_fa_seeding_mask_thr -nthreads 1 -force
     scil_image_math.py union ${sid}__fa_mask.nii.gz $wm_mask\
         ${sid}__seeding_mask.nii.gz --data_type uint8 -f
     cp ${sid}__seeding_mask.nii.gz ${sid}__tracking_mask.nii.gz
