@@ -115,13 +115,6 @@ workflow get_data_connectomics {
         // Setting up dwi channel in this order : sid, dwi, bval, bvec for lisibility.
         dwi_peaks_channel = dwi_peaks_channel.map{sid, bvals, bvecs, dwi, peaks -> tuple(sid, dwi, bvals, bvecs, peaks)}
 
-        // Setting up transfos channel in this order : sid, affine, syn, masksyn
-        // transfos_channel = transfos_channel.map{sid, affine, masksyn, syn -> tuple(sid, affine, syn, masksyn)}
-
-        // Flattening metrics channel.
-        metrics_channel = metrics_channel.transpose().groupTuple()
-                                .flatMap{ sid, metrics -> metrics.collect{ [sid, it] } }
-
         emit:
             trk = tracking_channel
             labels = labels_channel

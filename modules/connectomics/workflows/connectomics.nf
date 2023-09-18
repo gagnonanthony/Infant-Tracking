@@ -17,7 +17,7 @@ workflow CONNECTOMICS {
         fodf_channel
         metrics_channel
         t2w_channel
-        transfos_channels
+        transfos_channel
         
     main:
 

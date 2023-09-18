@@ -97,11 +97,14 @@ workflow {
         if ( params.run_connectomics && !params.run_tracking ) {
             data = get_data_connectomics()
 
+            metrics = data.metrics.transpose().groupTuple()
+                            .flatMap{ sid, metrics -> data.metrics.collect{ [sid, it] } }
+
             CONNECTOMICS(data.trk,
                          data.labels,
                          data.dwi_peaks,
                          data.fodf,
-                         data.metrics,
+                         metrics,
                          data.t2w,
                          data.transfos)
         }
@@ -140,6 +143,7 @@ def display_usage () {
                 "template_t1":"$params.template_t1",
                 "dwi_resolution":"$params.dwi_resolution",
                 "dwi_interpolation":"$params.dwi_interpolation",
+                "mask_dwi_interpolation":"$params.mask_dwi_interpolation",
                 "max_dti_shell_value":"$params.max_dti_shell_value",
                 "sh_fitting":"$params.sh_fitting",
                 "sh_fitting_order":"$params.sh_fitting_order",
