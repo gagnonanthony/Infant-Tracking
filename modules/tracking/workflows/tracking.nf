@@ -23,6 +23,7 @@ workflow TRACKING {
         if ( params.infant_config ) {
 
             masks_channel = anat_and_mask_channel
+                             .map{ [it[0], it[2]] }
                              .combine(fa_channel, by: 0)
 
             GENERATE_MASKS(masks_channel)

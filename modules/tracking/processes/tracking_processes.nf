@@ -35,7 +35,7 @@ process GENERATE_MASKS {
     cpus 1
 
     input:
-        tuple val(sid), path(t2w), path(wm_mask), path(fa)
+        tuple val(sid), path(wm_mask), path(fa)
     output:
         tuple val(sid), path("${sid}__seeding_mask.nii.gz"),
         path("${sid}__tracking_mask.nii.gz"), emit: masks
