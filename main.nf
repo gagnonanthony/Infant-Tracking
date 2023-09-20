@@ -67,18 +67,24 @@ workflow {
                 .combine(FODF.out.peaks, by: 0)
             fodf = FODF.out.fodf
 
-            // ** Default metrics will be used with combined metrics provided in the input folder ** //
-            provided_metrics = Channel.fromFilePairs("$input/**/metrics/*.nii.gz", size: -1, flat: true)
-                                    { fetch_id(it.parent, input) }
             def_metrics = DTI.out.fa_and_md
                 .combine(DTI.out.ad_and_rd, by: 0)
                 .combine(FODF.out.afd_and_nufo, by: 0)
-            metrics = def_metrics
-                .combine(provided_metrics, by: 0)
+                .map{ sid, fa, md, ad, rd, afd, nufo -> tuple(sid, [fa, md, ad, rd, afd, nufo])}
+                .transpose()
+
+            if ( file("$input/**/metrics/*.nii.gz") ) { 
+                // ** Default metrics will be used with combined metrics provided in the input folder ** //
+                provided_metrics = Channel.fromFilePairs("$input/**/metrics/*.nii.gz", size: -1, flat: false)
+                                    { fetch_id(it.parent.parent, input) }
+                                    .transpose()
+
+                def_metrics = def_metrics
+                                .concat(provided_metrics)
+            }
 
             // ** Flattening metrics channel ** //
-            metrics = metrics.transpose().groupTuple()
-                        .flatMap{ sid, metrics -> metrics.collect{ [sid, it] } }
+            metrics_flat = def_metrics.groupTuple()
 
             t2w = REGISTRATION.out.warped_anat
                         .map{ [it[0], it[1]] }
@@ -89,7 +95,7 @@ workflow {
                          labels,
                          dwi_peaks,
                          fodf,
-                         metrics,
+                         metrics_flat,
                          t2w,
                          transfos)
         }
@@ -98,7 +104,6 @@ workflow {
             data = get_data_connectomics()
 
             metrics = data.metrics.transpose().groupTuple()
-                            .flatMap{ sid, metrics -> data.metrics.collect{ [sid, it] } }
 
             CONNECTOMICS(data.trk,
                          data.labels,

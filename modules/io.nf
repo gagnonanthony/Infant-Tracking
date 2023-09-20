@@ -107,7 +107,7 @@ workflow get_data_connectomics {
             { fetch_id(it.parent, input) }
         metrics_channel = Channel.fromFilePairs("$input/**/metrics/*.nii.gz", size: -1, maxDepth: 2)
             { it.parent.parent.name }
-        t2w_channel = Channel.fromFilePairs("$input/**/*t2w_warped.nii.gz", size: 1, flat: true)
+        t2w_channel = Channel.fromFilePairs("$input/**/*t2w.nii.gz", size: 1, flat: true)
             { fetch_id(it.parent, input) }
         transfos_channel = Channel.fromFilePairs("$input/**/{0GenericAffine.mat,output1Warp.nii.gz}", size: 2, flat: true)
             { fetch_id(it.parent, input) }
