@@ -3,6 +3,7 @@
 nextflow.enable.dsl=2
 
 params.input = false
+params.references = false
 
 def fetch_id ( dir, dir_base ) {
     return dir_base.relativize(dir)
@@ -21,8 +22,8 @@ workflow get_data_tracking {
             log.info "                               [Input]"
             log.info "                               ├-- S1"
             log.info "                               |   ├-- *dwi.nii.gz"
-            log.info "                               |   ├-- *bval"
-            log.info "                               |   ├-- *bvec"
+            log.info "                               |   ├-- *dwi.bval"
+            log.info "                               |   ├-- *dwi.bvec"
             log.info "                               |   ├-- *revb0.nii.gz"
             log.info "                               |   ├-- *t2w.nii.gz"
             log.info "                               |   └-- *wm_mask.nii.gz"
@@ -67,8 +68,8 @@ workflow get_data_connectomics {
             log.info "                                [Input]"
             log.info "                                ├-- S1"
             log.info "                                |   ├-- *dwi.nii.gz"            
-            log.info "                                |   ├-- *bval"            
-            log.info "                                |   ├-- *bvec"                
+            log.info "                                |   ├-- *dwi.bval"            
+            log.info "                                |   ├-- *dwi.bvec"                
             log.info "                                |   ├-- *t2w.nii.gz"             
             log.info "                                |   ├-- *.trk"                  
             log.info "                                |   ├-- *labels.nii.gz"          
@@ -123,4 +124,51 @@ workflow get_data_connectomics {
             metrics = metrics_channel
             t2w = t2w_channel
             transfos = transfos_channel
+}
+
+workflow get_data_template {
+    main:
+    if ( !params.input ) {
+            log.info "You must provide an input folder containing all images using:"
+            log.info "        --input=/path/to/[input_folder]             Input folder containing multiple subjects for tracking"
+            log.info ""
+            log.info "                               [Input]"
+            log.info "                               ├-- S1"
+            log.info "                               |   ├-- *dwi.nii.gz"
+            log.info "                               |   ├-- *dwi.bvec"
+            log.info "                               |   ├-- *fa.nii.gz"
+            log.info "                               |   ├-- *t2w.nii.gz"
+            log.info "                               └-- S2"
+            log.info "                                    ├-- *dwi.nii.gz"
+            log.info "                                    ├-- *dwi.bvec"
+            log.info "                                    ├-- *fa.nii.gz"
+            log.info "                                    └-- *t2w.nii.gz"
+            log.info "                               [References]"
+            log.info "                               ├-- *fa_ref.nii.gz"
+            log.info "                               └-- *t2w_ref.nii.gz"
+            error "Please resubmit your command with the previous file structure."
+        }
+        
+        input = file(params.input)
+        references = file(params.references)
+
+        // Loading all files.
+        dwi_channel = Channel.fromFilePairs("$input/**/*dwi.{nii.gz,bvec}", size: 2, flat: true)
+            { fetch_id(it.parent, input) }
+        fa_channel = Channel.fromFilePairs("$input/**/*fa.nii.gz", size:1, flat: true)
+            { fetch_id(it.parent, input) }
+        anat_channel = Channel.fromFilePairs("$input/**/*t2w.nii.gz", size: 1, flat: true)
+            { fetch_id(it.parent, input) }
+        anat_ref = Channel.fromPath("$references/*t2w_ref.nii.gz")
+        fa_ref = Channel.fromPath("$references/*fa_ref.nii.gz")
+
+        // Setting up dwi channel in this order : sid, dwi, bval, bvec for lisibility.
+        dwi_channel = dwi_channel.map{sid, bvecs, dwi -> tuple(sid, dwi, bvecs)}
+        
+    emit:
+        dwi = dwi_channel
+        anat = anat_channel
+        fa = fa_channel
+        anat_ref = anat_ref
+        fa_ref = fa_ref
 }

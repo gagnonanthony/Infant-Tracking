@@ -7,64 +7,97 @@ params.help = false
 // Importing modules and processes
 include { fetch_id;
           get_data_tracking;
-          get_data_connectomics } from "./modules/io.nf"
-include { PREPROCESSING } from "./modules/tracking/workflows/preprocessing.nf"
+          get_data_connectomics;
+          get_data_template } from "./modules/io.nf"
+include { DWI;
+          ANAT } from "./modules/tracking/workflows/preprocessing.nf"
 include { DTI } from "./modules/tracking/workflows/DTI.nf"
 include { SH } from "./modules/tracking/workflows/SH.nf"
 include { REGISTRATION } from "./modules/tracking/workflows/registration.nf"
 include { FODF } from "./modules/tracking/workflows/FODF.nf"
 include { TRACKING } from "./modules/tracking/workflows/tracking.nf"
 include { CONNECTOMICS } from "./modules/connectomics/workflows/connectomics.nf"
+include { POPULATION_TEMPLATE } from "./modules/template/workflows/pop_template.nf"
 
 workflow {
-    if (params.help) display_usage()
+    if (params.help) { display_usage() }
     else {
         display_run_info()
+
+        if ( params.template_config ) {
+            data = get_data_template()
+
+            POPULATION_TEMPLATE(data.anat,
+                                data.dwi,
+                                data.fa,
+                                data.anat_ref,
+                                data.fa_ref)
+        }
 
         if ( params.run_tracking ) {
             data = get_data_tracking()
 
-            PREPROCESSING(data.dwi, 
-                          data.rev, 
-                          data.anat, 
-                          data.wm_mask)
-            
-            DTI(PREPROCESSING.out.dwi_bval_bvec,
-                PREPROCESSING.out.b0_and_mask)
+            // ** Merging mask and anat if -profile infant. ** //
+            if ( params.infant_config ) {
+                anat_channel = data.anat
+                                .combine(data.wm_mask, by: 0)
+            } 
+            else {
+                anat_channel = data.anat
+            }
+            // ** Anatomical preprocessing ** //
+            ANAT(anat_channel)
 
-            if(params.sh_fitting) {
-                SH(PREPROCESSING.out.dwi_bval_bvec)
+            // ** DWI preprocessing ** //
+            DWI(data.dwi,
+                data.rev)
+            
+            // ** DTI modelling ** //
+            DTI(DWI.out.dwi_bval_bvec,
+                DWI.out.b0_and_mask)
+
+            // ** SH fitting if set ** //
+            if ( params.sh_fitting ) {
+                SH(DWI.out.dwi_bval_bvec)
             }
 
+            // ** Registration of anatomical volume on diffusion volumes. ** //
             REGISTRATION(DTI.out.fa_and_md,
-                        PREPROCESSING.out.t2w_and_mask,
-                        PREPROCESSING.out.b0_and_mask.map{ [it[0], it[1]] })
+                        ANAT.out.anat_and_mask,
+                        DWI.out.b0_and_mask.map{ [it[0], it[1]] })
             
-            b0_mask_channel = PREPROCESSING.out.b0_and_mask
-                .map{[it[0], it[2]]}
+            // ** Extracting b0 ** //
+            b0_mask_channel = DWI.out.b0_and_mask
+                                .map{[it[0], it[2]]}
             
-            FODF(PREPROCESSING.out.dwi_bval_bvec,
+            // ** Modelling FODF ** //
+            FODF(DWI.out.dwi_bval_bvec,
                 b0_mask_channel,
                 DTI.out.fa_and_md)
 
+            // ** FA channel for tracking maps ** //
             fa_channel = DTI.out.fa_and_md
                 .map{[it[0], it[1]]}
 
+            // ** Tracking ** //
             TRACKING(REGISTRATION.out.warped_anat,
                     FODF.out.fodf,
                     fa_channel)
         }
 
         if ( params.run_connectomics && params.run_tracking ) {
+            // ** Fetch tracking data ** //
             tracking = TRACKING.out.trk
 
-            // ** Labels needs to be provided as an input, since they are not computed at some point in the pipeline ** //
+            // ** Labels needs to be provided as an input, since they are not computed at ** //
+            // ** some point in the pipeline ** //
             input = file(params.input)
             labels = Channel.fromFilePairs("$input/**/*labels.nii.gz", size: 1, flat: true)
                         { fetch_id(it.parent, input) }
 
-            dwi_peaks = PREPROCESSING.out.dwi_bval_bvec
-                .combine(FODF.out.peaks, by: 0)
+            // ** Preparing metrics channel ** //
+            dwi_peaks = DWI.out.dwi_bval_bvec
+                            .combine(FODF.out.peaks, by: 0)
             fodf = FODF.out.fodf
 
             def_metrics = DTI.out.fa_and_md
@@ -86,18 +119,21 @@ workflow {
             // ** Flattening metrics channel ** //
             metrics_flat = def_metrics.groupTuple()
 
+            // ** Fetching anat ** //
             t2w = REGISTRATION.out.warped_anat
                         .map{ [it[0], it[1]] }
 
+            // ** Fetching transformation files ** //
             transfos = REGISTRATION.out.transfos
 
+            // ** Launching connectomics workflow ** //
             CONNECTOMICS(tracking,
-                         labels,
-                         dwi_peaks,
-                         fodf,
-                         metrics_flat,
-                         t2w,
-                         transfos)
+                        labels,
+                        dwi_peaks,
+                        fodf,
+                        metrics_flat,
+                        t2w,
+                        transfos)
         }
 
         if ( params.run_connectomics && !params.run_tracking ) {
@@ -106,12 +142,12 @@ workflow {
             metrics = data.metrics.transpose().groupTuple()
 
             CONNECTOMICS(data.trk,
-                         data.labels,
-                         data.dwi_peaks,
-                         data.fodf,
-                         metrics,
-                         data.t2w,
-                         data.transfos)
+                        data.labels,
+                        data.dwi_peaks,
+                        data.fodf,
+                        metrics,
+                        data.t2w,
+                        data.transfos)
         }
     }
 }
@@ -125,7 +161,21 @@ if (!params.help) {
 }
 
 def display_usage () {
-    usage = file("$projectDir/USAGE")
+    if (params.run_tracking && !params.infant_config) { 
+        usage = file("$projectDir/modules/tracking/USAGE")
+    } 
+    else if (params.run_tracking && params.infant_config) {
+        usage = file("$projectDir/modules/tracking/USAGE_INFANT")
+    }
+    else if (params.run_connectomics && !params.infant_config) {
+        usage = file("$projectDir/modules/connectomics/USAGE")
+    }
+    else if (params.run_connectomics && params.infant_config) {
+        usage = file("$projectDir/modules/connectomics/USAGE_INFANT")
+    }
+    else {
+        usage = file("$projectDir/USAGE")
+    }    
 
     cpu_count = Runtime.runtime.availableProcessors()
     bindings = ["b0_thr":"$params.b0_thr",
@@ -229,8 +279,10 @@ def display_usage () {
                 "processes_commit":"$params.processes_commit",
                 "processes_afd_fixel":"$params.processes_afd_fixel",
                 "processes_connectivity":"$params.processes_connectivity",
+                "references":"$params.references",
                 "run_tracking":"$params.run_tracking",
-                "run_connectomics":"$params.run_connectomics"
+                "run_connectomics":"$params.run_connectomics",
+                "template_config":"$params.template_config"
                 ]
 
     engine = new groovy.text.SimpleTemplateEngine()

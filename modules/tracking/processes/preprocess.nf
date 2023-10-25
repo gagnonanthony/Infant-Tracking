@@ -11,20 +11,23 @@ process BET_DWI {
     output:
         tuple val(sid), path("${sid}__dwi_bet.nii.gz"), emit: bet_dwi
     script:
+    // ** Using a combination of preliminary bet, powder average computation and then final bet. ** //
+    // ** This might not be necessary for good quality data, but returns much more robust results on ** //
+    // ** infant data. ** //
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     scil_extract_b0.py $dwi $bval $bvec ${sid}__b0_mean.nii.gz\
         --b0_thr $params.b0_thr --force_b0_threshold --mean
-    bet2 ${sid}__b0_mean.nii.gz ${sid}__b0_bet -f $params.initial_bet_f -m
+    bet ${sid}__b0_mean.nii.gz ${sid}__b0_bet -f $params.initial_bet_f -m -R
     scil_image_math.py convert ${sid}__b0_bet_mask.nii.gz ${sid}__b0_bet_mask.nii.gz\
         --data_type uint8 -f
     mrcalc $dwi ${sid}__b0_bet_mask.nii.gz -mult ${sid}__dwi_bet_prelim.nii.gz\
         -quiet -force -nthreads 1
     scil_compute_powder_average.py ${sid}__dwi_bet_prelim.nii.gz $bval\
         ${sid}__powder_avg.nii.gz --b0_thr $params.b0_thr -f
-    bet2 ${sid}__powder_avg.nii.gz ${sid}__powder_avg_bet -m -f $params.final_bet_f
+    bet ${sid}__powder_avg.nii.gz ${sid}__powder_avg_bet -m -R -f $params.final_bet_f
     scil_image_math.py convert ${sid}__powder_avg_bet_mask.nii.gz ${sid}__powder_avg_bet_mask.nii.gz\
         --data_type uint8 -f
     mrcalc $dwi ${sid}__powder_avg_bet_mask.nii.gz -mult ${sid}__dwi_bet.nii.gz\
@@ -39,13 +42,15 @@ process BET_T2 {
     input:
         tuple val(sid), path(anat)
     output:
-        tuple val(sid), path("${sid}__t2w_bet.nii.gz"), emit: bet_t2
+        tuple val(sid), path("${sid}__t2w_bet.nii.gz"), emit: t2_bet
+    when:
+        params.infant_config
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    bet2 $anat ${sid}__t2w_bet.nii.gz -f $params.bet_anat_f
+    bet $anat ${sid}__t2w_bet.nii.gz -f $params.bet_anat_f -R
     """
 }
 
@@ -230,9 +235,11 @@ process CROP_ANAT {
     cpus 1
 
     input:
-        tuple val(sid), path(t2w), path(wm_mask)
+        tuple val(sid), path(t2w), path(mask)
     output:
-        tuple val(sid), path("${sid}__t2w_cropped.nii.gz"), path("${sid}__wm_mask_cropped.nii.gz"), emit: cropped_t2w_and_mask
+        tuple val(sid), 
+        path("${sid}__t2w_cropped.nii.gz"), 
+        path("${sid}__mask_cropped.nii.gz"), emit: cropped_anat_and_mask
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -240,7 +247,7 @@ process CROP_ANAT {
     export OPENBLAS_NUM_THREADS=1
     scil_crop_volume.py $t2w ${sid}__t2w_cropped.nii.gz\
         --output_bbox t2w_boundingBox.pkl -f
-    scil_crop_volume.py $wm_mask ${sid}__wm_mask_cropped.nii.gz\
+    scil_crop_volume.py $mask ${sid}__mask_cropped.nii.gz\
         --input_bbox t2w_boundingBox.pkl -f
     """
 }
@@ -274,7 +281,8 @@ process BET_T1 {
     input:
         tuple val(sid), path(t1)
     output:
-        tuple val(sid), path("${sid}__t1_bet.nii.gz"), 
+        tuple val(sid), 
+        path("${sid}__t1_bet.nii.gz"), 
         path("${sid}__t1_bet_mask.nii.gz"), emit: t1_and_mask_bet
     when:
         !params.infant_config
@@ -301,6 +309,8 @@ process RESAMPLE_ANAT {
         tuple val(sid), path(t2w), path(mask)
     output:
         tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__mask_resampled.nii.gz"), emit: t2w_and_mask
+    when:
+        params.infant_config
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -345,7 +355,7 @@ process NORMALIZE {
     export OPENBLAS_NUM_THREADS=1
 
     shells=\$(awk -v max="$params.max_dti_shell_value" '{for (i = 1; i <= NF; i++) {v = int(\$i);if (v <= max) shells[v] = 1;}}END {for (v in shells) print v;}' "$bval" |\
-             sort -n | tr '\n' ' ')
+                sort -n | tr '\n' ' ')
     
     scil_extract_dwi_shell.py $dwi $bval $bvec \$shells\
         dwi_dti.nii.gz bval_dti bvec_dti -t $params.dwi_shell_tolerance
