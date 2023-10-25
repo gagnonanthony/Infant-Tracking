@@ -3,22 +3,13 @@ on: [push, pull_request]
 
 jobs:
   test:
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
-      NXF_ANSI_LOG: false
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nxf_ver: ['22.10.6', '23.10.0']
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
+      - uses: actions/checkout@v4
+      - uses: nf-core/setup-nextflow@v1
       - name: Pull docker image
         run: |
-          docker pull scilus/docker-tractoflow:latest
+          docker pull scilus/scilus:latest
       - name: Run pipeline
         run: |
           nextflow run ${GITHUB_WORKSPACE} --help -with-docker scilus/docker-tractoflow:latest
