@@ -28,7 +28,8 @@ workflow get_data_freesurfer {
         input = file(params.input)
 
         // ** Loading files ** //
-        anat_channel = Channel.fromFilePairs("$input/**/*t1.nii.gz", size: 1, flat: true)
+        anat_channel = Channel.fromPath("$input/**/*t1.nii.gz")
+                        .map{ch1 -> [ch1.parent.name, ch1]}
 
     emit:
         anat = anat_channel

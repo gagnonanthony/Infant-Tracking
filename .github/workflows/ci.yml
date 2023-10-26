@@ -6,10 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: eWaterCycle/setup-apptainer@v2.0.0
       - uses: nf-core/setup-nextflow@v1
-      - name: Pull docker image
+      - name: Build Docker Image.
         run: |
-          docker pull scilus/scilus:latest
-      - name: Run pipeline
+          docker build -t childbrainflow_image ${GITHUB_WORKSPACE}/containers/.
+      - name: Build Singularity Image.
         run: |
-          nextflow run ${GITHUB_WORKSPACE} --help -with-docker scilus/docker-tractoflow:latest
+          singularity build childbrainflow_image.sif ${GITHUB_WORKSPACE}/containers/singularity_recipe.def
+      - name: Run pipeline with Docker
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} --help -with-docker childbrainflow_image
+      - name: Run pipeline with Singularity
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} --help -with-singularity childbrainflow_image.sif

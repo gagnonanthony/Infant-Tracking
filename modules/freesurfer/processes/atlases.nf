@@ -75,14 +75,14 @@ process LAUSANNE {
 
     input:
         tuple val(sid), path(folder)
-        each path(scale)
+        each scale
 
     output:
-        tuple val(sid), path("[lausanne_2008_scale_1]*.nii.gz"), lausanne_1
-        tuple val(sid), path("[lausanne_2008_scale_2]*.nii.gz"), lausanne_2
-        tuple val(sid), path("[lausanne_2008_scale_3]*.nii.gz"), lausanne_3
-        tuple val(sid), path("[lausanne_2008_scale_4]*.nii.gz"), lausanne_4
-        tuple val(sid), path("[lausanne_2008_scale_5]*.nii.gz"), lausanne_5
+        tuple val(sid), path("[lausanne_2008_scale_1]*.nii.gz"), emit: lausanne_1
+        tuple val(sid), path("[lausanne_2008_scale_2]*.nii.gz"), emit: lausanne_2
+        tuple val(sid), path("[lausanne_2008_scale_3]*.nii.gz"), emit: lausanne_3
+        tuple val(sid), path("[lausanne_2008_scale_4]*.nii.gz"), emit: lausanne_4
+        tuple val(sid), path("[lausanne_2008_scale_5]*.nii.gz"), emit: lausanne_5
         path("*.txt")
         path("*.json")
     
@@ -93,7 +93,7 @@ process LAUSANNE {
     """
     ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
     freesurfer_home=\$(dirname \$(dirname \$(which mri_label2vol)))
-    python3.7 $params.atlas_utils_folder/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
+    python $params.atlas_utils_folder/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
         \$(dirname ${folder}) ${sid} \$freesurfer_home --scale ${scale} --dilation_factor 0 --log_level DEBUG
 
     mri_convert ${folder}/mri/rawavg.mgz rawavg.nii.gz

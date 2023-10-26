@@ -76,7 +76,7 @@ process LOCAL_TRACKING_MASK {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        mrcalc $fa $params.local_fa_tracking_mask_threshold -ge ${sid}__local_tracking_mask.nii.gz\
+        mrcalc $fa $params.local_fa_tracking_mask_thr -ge ${sid}__local_tracking_mask.nii.gz\
             -datatype uint8
         """
 }
@@ -102,7 +102,7 @@ process LOCAL_SEEDING_MASK {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        mrcalc $fa $params.local_fa_seeding_mask_threshold -ge ${sid}__local_seeding_mask.nii.gz\
+        mrcalc $fa $params.local_fa_seeding_mask_thr -ge ${sid}__local_seeding_mask.nii.gz\
             -datatype uint8
         """
 }
@@ -151,7 +151,7 @@ process PFT_SEEDING_MASK {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        scil_image_math.py union $wm, $interface_mask ${sid}__pft_seeding_mask.nii.gz\
+        scil_image_math.py union $wm $interface_mask ${sid}__pft_seeding_mask.nii.gz\
             --data_type uint8
         """
     else if (params.pft_seeding_mask_type == "interface")
@@ -163,7 +163,7 @@ process PFT_SEEDING_MASK {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        mrcalc $fa $params.pft_fa_seeding_mask_threshold -ge ${sid}__pft_seeding_mask.nii.gz\
+        mrcalc $fa $params.pft_fa_seeding_mask_thr -ge ${sid}__pft_seeding_mask.nii.gz\
             -datatype uint8
         """
 }
@@ -198,6 +198,7 @@ process PFT_TRACKING {
 
     input:
         tuple val(sid), path(fodf), path(include), path(exclude), path(seed)
+
     output:
         tuple val(sid), path("${sid}__pft_tracking.trk"), emit: tractogram
     when:
@@ -212,7 +213,7 @@ process PFT_TRACKING {
     scil_compute_pft.py $fodf $seed $include $exclude\
         tmp.trk\
         --algo $params.pft_algo --$params.pft_seeding $params.pft_nbr_seeds\
-        --seed $curr_seed --step $params.step_size --theta $params.theta\
+        --seed $params.pft_random_seed --step $params.pft_step_size --theta $params.pft_theta\
         --sfthres $params.pft_sfthres --sfthres_init $params.pft_sfthres_init\
         --min_length $params.pft_min_len --max_length $params.pft_max_len\
         --particles $params.pft_particles --back $params.pft_back\

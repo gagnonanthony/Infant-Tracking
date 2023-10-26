@@ -28,9 +28,8 @@ workflow FREESURFERFLOW {
 
         // ** Computing lausanne atlas ** //
         scales = Channel.from(1,2,3,4,5)
-        lausanne_channel = FREESURFER.out.folders
-                                .combine(scales, by: 0)
-        LAUSANNE(FREESURFER.out.folders)
+        LAUSANNE(FREESURFER.out.folders,
+                scales)
 
         // ** Work out a way for the user to select which atlas to use. ** //
         // ** Could be cleaner than a bunch of if statements in the future. ** //

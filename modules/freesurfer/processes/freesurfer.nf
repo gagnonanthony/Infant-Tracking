@@ -8,7 +8,7 @@ process FREESURFER {
     input:
         tuple val(sid), path(anat)
     output:
-        tuple val(sid), "$sid/", emit: folders
+        tuple val(sid), path("$sid/"), emit: folders
 
     script:
     """

@@ -43,7 +43,7 @@ workflow {
                                 data.fa_ref)
         }
 
-        if ( params.freesurfer ) {
+        if ( params.run_freesurfer ) {
             data = get_data_freesurfer()
 
             FREESURFERFLOW(data.anat)
@@ -110,8 +110,8 @@ workflow {
 
             // ** Fetching labels from freesurferflow if -profile freesurfer is used, if not, ** //
             // ** fetching it from input files. ** //
+            input = file(params.input)
             if ( !params.run_freesurfer ) {
-                input = file(params.input)
                 labels = Channel.fromFilePairs("$input/**/*labels.nii.gz", size: 1, flat: true)
                             { fetch_id(it.parent, input) }
             } else {
