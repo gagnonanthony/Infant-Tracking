@@ -4,25 +4,34 @@ nextflow.enable.dsl=2
 
 params.help = false
 
-// Importing modules and processes
-include { fetch_id;
-          get_data_tracking;
-          get_data_connectomics;
-          get_data_template } from "./modules/io.nf"
-include { DWI;
-          ANAT } from "./modules/tracking/workflows/preprocessing.nf"
-include { DTI } from "./modules/tracking/workflows/DTI.nf"
-include { SH } from "./modules/tracking/workflows/SH.nf"
-include { REGISTRATION } from "./modules/tracking/workflows/registration.nf"
-include { FODF } from "./modules/tracking/workflows/FODF.nf"
-include { TRACKING } from "./modules/tracking/workflows/tracking.nf"
-include { CONNECTOMICS } from "./modules/connectomics/workflows/connectomics.nf"
-include { POPULATION_TEMPLATE } from "./modules/template/workflows/pop_template.nf"
+// ** Importing modules and processes ** //
+include {   fetch_id;
+            get_data_freesurfer;
+            get_data_tracking;
+            get_data_tracking_infant;
+            get_data_connectomics;
+            get_data_connectomics_infant;
+            get_data_template } from "./modules/io.nf"
+include {   DWI;
+            ANAT } from "./modules/tracking/workflows/preprocessing.nf"
+include {   DTI } from "./modules/tracking/workflows/DTI.nf"
+include {   SH } from "./modules/tracking/workflows/SH.nf"
+include {   REGISTRATION } from "./modules/tracking/workflows/registration.nf"
+include {   FODF } from "./modules/tracking/workflows/FODF.nf"
+include {   TRACKING } from "./modules/tracking/workflows/tracking.nf"
+include {   CONNECTOMICS } from "./modules/connectomics/workflows/connectomics.nf"
+include {   POPULATION_TEMPLATE } from "./modules/template/workflows/pop_template.nf"
+include {   FREESURFERFLOW } from "./modules/freesurfer/workflows/freesurferflow.nf"
 
 workflow {
     if (params.help) { display_usage() }
     else {
         display_run_info()
+
+        // ** Checking compatibility between profiles. ** //
+        if ( params.infant_config && params.run_freesurfer ) {
+            error "Profiles infant_config and freesurfer are not compatible since infant_freesurfer is not implemented."
+        }
 
         if ( params.template_config ) {
             data = get_data_template()
@@ -34,8 +43,18 @@ workflow {
                                 data.fa_ref)
         }
 
+        if ( params.freesurfer ) {
+            data = get_data_freesurfer()
+
+            FREESURFERFLOW(data.anat)
+        }
+
         if ( params.run_tracking ) {
-            data = get_data_tracking()
+            if ( params.infant_config ) {
+                data = get_data_tracking_infant()
+            } else {
+                data = get_data_tracking()
+            }
 
             // ** Merging mask and anat if -profile infant. ** //
             if ( params.infant_config ) {
@@ -89,11 +108,15 @@ workflow {
             // ** Fetch tracking data ** //
             tracking = TRACKING.out.trk
 
-            // ** Labels needs to be provided as an input, since they are not computed at ** //
-            // ** some point in the pipeline ** //
-            input = file(params.input)
-            labels = Channel.fromFilePairs("$input/**/*labels.nii.gz", size: 1, flat: true)
-                        { fetch_id(it.parent, input) }
+            // ** Fetching labels from freesurferflow if -profile freesurfer is used, if not, ** //
+            // ** fetching it from input files. ** //
+            if ( !params.run_freesurfer ) {
+                input = file(params.input)
+                labels = Channel.fromFilePairs("$input/**/*labels.nii.gz", size: 1, flat: true)
+                            { fetch_id(it.parent, input) }
+            } else {
+                labels = FREESURFERFLOW.out.labels
+            }
 
             // ** Preparing metrics channel ** //
             dwi_peaks = DWI.out.dwi_bval_bvec
@@ -137,12 +160,22 @@ workflow {
         }
 
         if ( params.run_connectomics && !params.run_tracking ) {
-            data = get_data_connectomics()
+            if ( params.infant_config ) {
+                data = get_data_connectomics_infant()
+            } else {
+                data = get_data_connectomics()
+            }
+
+            if ( params.run_freesurfer ) {
+                labels = FREESURFERFLOW.out.labels
+            } else {
+                labels = data.labels
+            }
 
             metrics = data.metrics.transpose().groupTuple()
 
             CONNECTOMICS(data.trk,
-                        data.labels,
+                        labels,
                         data.dwi_peaks,
                         data.fodf,
                         metrics,
@@ -161,6 +194,7 @@ if (!params.help) {
 }
 
 def display_usage () {
+    
     if (params.run_tracking && !params.infant_config) { 
         usage = file("$projectDir/modules/tracking/USAGE")
     } 
@@ -179,6 +213,7 @@ def display_usage () {
 
     cpu_count = Runtime.runtime.availableProcessors()
     bindings = ["b0_thr":"$params.b0_thr",
+                "skip_dwi_preprocessing":"$params.skip_dwi_preprocessing",
                 "initial_bet_f":"$params.initial_bet_f",
                 "final_bet_f":"$params.final_bet_f",
                 "run_bet_anat":"$params.run_bet_anat",
@@ -217,6 +252,7 @@ def display_usage () {
                 "roi_radius":"$params.roi_radius",
                 "set_frf":"$params.set_frf",
                 "manual_frf":"$params.manual_frf",
+                "number_of_tissues":"$params.number_of_tissues",
                 "run_pft_tracking":"$params.run_pft_tracking",
                 "pft_compress_streamlines":"$params.pft_compress_streamlines",
                 "pft_seeding_mask_type":"$params.pft_seeding_mask_type",
@@ -280,9 +316,29 @@ def display_usage () {
                 "processes_afd_fixel":"$params.processes_afd_fixel",
                 "processes_connectivity":"$params.processes_connectivity",
                 "references":"$params.references",
+                "use_freesurfer_atlas":"$params.use_freesurfer_atlas",
+                "use_brainnetome_atlas":"$params.use_brainnetome_atlas",
+                "use_glasser_atlas":"$params.use_glasser_atlas",
+                "use_schaefer_100_atlas":"$params.use_schaefer_100_atlas",
+                "use_schaefer_200_atlas":"$params.use_schaefer_200_atlas",
+                "use_schaefer_400_atlas":"$params.use_schaefer_400_atlas",
+                "use_lausanne_1_atlas":"$params.use_lausanne_1_atlas",
+                "use_lausanne_2_atlas":"$params.use_lausanne_2_atlas",
+                "use_lausanne_3_atlas":"$params.use_lausanne_3_atlas",
+                "use_lausanne_4_atlas":"$params.use_lausanne_4_atlas",
+                "use_lausanne_5_atlas":"$params.use_lausanne_5_atlas",
+                "use_dilated_labels":"$params.use_dilated_labels",
+                "nb_threads":"$params.nb_threads",
+                "atlas_utils_folder":"$params.atlas_utils_folder",
+                "compute_FS_BN_GL_SF":"$params.compute_FS_BN_GL_SF",
+                "compute_lausanne_multiscale":"$params.compute_lausanne_multiscale",
+                "compute_lobes":"$params.compute_lobes",
+                "run_freesurfer":"$params.run_freesurfer",
                 "run_tracking":"$params.run_tracking",
                 "run_connectomics":"$params.run_connectomics",
-                "template_config":"$params.template_config"
+                "template_config":"$params.template_config",
+                "processes":"$params.processes",
+                "cpu_count":"$cpu_count"
                 ]
 
     engine = new groovy.text.SimpleTemplateEngine()

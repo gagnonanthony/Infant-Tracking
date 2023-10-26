@@ -18,7 +18,8 @@ include {
     RESAMPLE_T1;
     NORMALIZE;
     RESAMPLE_DWI;
-    EXTRACT_B0
+    EXTRACT_B0;
+    DWI_MASK
 } from '../processes/preprocess.nf'
 
 workflow DWI {
@@ -57,9 +58,16 @@ workflow DWI {
         N4(n4_channel)
 
         // ** Crop ** //
+        if ( params.skip_dwi_preprocessing ) {
+            DWI_MASK(dwi_channel)
+            crop_channel = dwi_channel.map{ [it[0], it[1]] }
+                                .combine(DWI_MASK.out.dwi_mask, by: 0)
+            CROP_DWI(crop_channel)
+        } else {
         dwi_crop_channel = N4.out
             .combine(EDDY_TOPUP.out.b0_mask, by: 0)
         CROP_DWI(dwi_crop_channel)
+        }
 
         // ** Normalization ** //
         normalize_channel = CROP_DWI.out.dwi
@@ -68,16 +76,28 @@ workflow DWI {
         NORMALIZE(normalize_channel)
 
         // ** Resampling ** //
+        if ( params.skip_dwi_preprocessing ) {
+            resample_channel = CROP_DWI.out.dwi
+                                    .combine(CROP_DWI.out.mask, by: 0)
+            RESAMPLE_DWI(resample_channel)
+        } else {
         resample_dwi_channel = NORMALIZE.out.dwi_normalized
             .combine(CROP_DWI.out.mask, by: 0)
         RESAMPLE_DWI(resample_dwi_channel)
+        }
 
         // ** Extracting b0 ** //
+        if ( params.skip_dwi_preprocessing ) {
+            extract_b0_channel = RESAMPLE_DWI.out.dwi_resampled
+                            .combine(dwi_channel.map{ [it[0], it[2], it[3]] }, by: 0)
+            EXTRACT_B0(extract_b0_channel)
+        } else {
         extract_b0_channel = EDDY_TOPUP.out.dwi_bval_bvec
             .map{[it[0], it[2], it[3]]}
             .combine(RESAMPLE_DWI.out.dwi_resampled, by: 0)
             .map{ sid, bval, bvec, dwi -> tuple(sid, dwi, bval, bvec)}
         EXTRACT_B0(extract_b0_channel)
+        }
 
     emit:
         dwi_bval_bvec = extract_b0_channel
@@ -96,15 +116,21 @@ workflow ANAT {
         N4_T1(DENOISE_T1.out.t1_denoised)
 
         // ** Resampling ** //
-        RESAMPLE_T1(N4_T1.out.t1_n4)
-        // ** Resample if -profile infant ** //
-        RESAMPLE_ANAT(anat_channel)
+        if ( params.infant_config ) {
+            // ** Resample if -profile infant ** //
+            RESAMPLE_ANAT(anat_channel)
+        } else {
+            RESAMPLE_T1(N4_T1.out.t1_n4)
+        }
 
         // ** Bet ** //
-        BET_T1(RESAMPLE_T1.out.t1_resampled)
-        // ** Bet if -profile infant ** //
-        BET_T2(RESAMPLE_ANAT.out.t2w_and_mask.map{ [it[0], it[1]] })
-        
+        if ( params.infant_config ) {
+            // ** Bet if -profile infant ** //
+            BET_T2(RESAMPLE_ANAT.out.t2w_and_mask.map{ [it[0], it[1]] })
+        } else {
+            BET_T1(RESAMPLE_T1.out.t1_resampled)
+        }
+
         // ** Crop ** //
         if ( params.infant_config ) {
             crop_channel = BET_T2.out.t2_bet

@@ -1,5 +1,5 @@
-Infant-DWI
-===============
+ChildBrainFlow Pipeline
+=======================
 Complete pipeline to perform tractography from infant diffusion MRI data. Adapted from the SCIL TractoFlow Pipeline (https://github.com/scilus/tractoflow.git) and Connectoflow Pipeline (https://github.com/scilus/connectoflow.git).
 
 SINGULARITY

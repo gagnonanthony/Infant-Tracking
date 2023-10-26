@@ -1,20 +1,24 @@
 
-DWI Pipeline
-========================
+ChildBrainFlow Pipeline
+=======================
 
-Pipeline adapted from the SCIL Tractoflow pipeline (https://github.com/scilus/tractoflow.git) [1].
+ChildBrainFlow is an end-to-end pipeline that performs tractography, t1 reconstruction and connectomics.
+It is essentially a merged version of multiple individual pipeline to avoid the handling of inputs/outputs
+between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
+process have been taken: 
 
-It is possible to also run a connectivity analysis following tracking. Using -profile connectomics,
-the pipeline will perform connectivity analysis based on atlas segmentation. The connectomics processes
-are imported from the Connectoflow pipeline (https://github.com/scilus/connectoflow.git).
+    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
+    3. Connectoflow (https://github.com/scilus/connectoflow)
 
-Both analysis (tracking and connectomics) can be performed one after another automatically (using
--profile tracking,connectomics). The pipeline will then reorganised channel to provide the correct inputs.
+*** Please note that some steps have been removed from the original pipelines if they were not relevant ***
+*** for pediatric data. If you need some of these steps, please use the original pipelines. ***
 
 [1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
-TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
-leveraging Nextflow & Singularity, NeuroImage,
-https://doi.org/10.1016/j.neuroimage.2020.116889.
+    TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
+    leveraging Nextflow & Singularity, NeuroImage,
+    https://doi.org/10.1016/j.neuroimage.2020.116889.
+
 
 Run Tracking Pipeline
 
@@ -31,7 +35,7 @@ DESCRIPTION
                                                 |   ├-- *.bvec
                                                 |   ├-- *revb0.nii.gz
                                                 |   ├-- *t1w.nii.gz
-                                                |   ├-- *labels.nii.gz          [Only if connectomics is also selected]
+                                                |   ├-- *labels.nii.gz          [Required if -profile connectomics is selected, not required when -profile freesurfer is used.]
                                                 |   └-- metrics
                                                 |       └-- METRIC_NAME.nii.gz  [Optional, only if connectomics is also
                                                 |                                selected]
@@ -41,7 +45,7 @@ DESCRIPTION
                                                     ├-- *bvec
                                                     ├-- *revb0.nii.gz
                                                     ├-- *t1w.nii.gz
-                                                    ├-- *labels.nii.gz          [Only if connectomics is also selected]
+                                                    ├-- *labels.nii.gz          [Required if -profile connectomics is selected, not required when -profile freesurfer is used.]
                                                     └-- metrics
                                                         └-- METRIC_NAME.nii.gz  [Optional, only if connectomics is also
                                                                                  selected]
@@ -53,19 +57,19 @@ OPTIONAL ARGUMENTS (current value)
     --b0_thr                                    All b-values below b0_thr will be considered b=0 images. ($b0_thr)
     --dwi_shell_tolerance                       All b-values +/- dwi_shell_tolerance will be considered the same
                                                 b-value. ($dwi_shell_tolerance)
+    --skip_dwi_preprocessing                    If set, will skip all preprocessing steps and go straight to local
+                                                modelling. Useful when input data is already preprocessed.
+                                                ($skip_dwi_preprocessing)
 
     BET DWI OPTIONS
     --initial_bet_f                             Fractional intensity threshold for initial bet. ($initial_bet_f)
     --final_bet_f                               Fractional intensity threshold for final bet. ($final_bet_f)
 
-    BET ANAT OPTIONS
-    --run_bet_anat                              If set, will perform brain extraction on the input anat volume.
-                                                ($run_bet_anat)
-                                                Default settings are soft to make sure an already brain extracted volume
-                                                is not impacted
-                                                by the bet command. The goal is to clean volumes that still have
-                                                portions of non-brain structures.
-    --bet_anat_f                                Fractional intensity threshold for bet. ($bet_anat_f)
+    BET T1 OPTIONS
+    --template_t1                               Path to the template T1 directory for antsBrainExtraction.
+                                                The folder must contain t1_template.nii.gz and 
+                                                t1_brain_probability_map.nii.gz. The default path is the human_data 
+                                                folder in the singularity container ($template_t1).
 
     EDDY AND TOPUP OPTIONS
     --encoding_direction                        Encoding direction of the dwi [x, y, z]. ($encoding_direction)
@@ -183,6 +187,8 @@ OPTIONAL ARGUMENTS (current value)
                                                 (--tracking_seed 1,2,3)
 
     PROCESSES OPTIONS
+    --processes                                 The number of parallel processes to launch ($cpu_count).
+                                                Only affects the local scheduler.
     --processes_denoise_dwi                     Number of processes for DWI denoising task ($processes_denoise_dwi)
     --processes_eddy                            Number of processes for EDDY task. ($processes_eddy)
     --processes_registration                    Number of processes for registration task. ($processes_registration)
@@ -192,7 +198,7 @@ OPTIONAL ARGUMENTS (current value)
 
     OUTPUT OPTIONS
     --output_dir                                Directory to write the final results. Default is 
-                                                "./Results_Infant_Tracking/".
+                                                "./Results_ChildBrainFlow/".
 
 AVAILABLE PROFILES (using -profile option (e.g. -profile no_symlink,macos,tracking))
 
@@ -203,6 +209,8 @@ macos                                           When used, the scratch folder wi
 
 tracking                                        When used, will perform the tracking pipeline to generate the 
                                                 whole-brain tractogram from raw diffusion images.
+
+freesurfer                                      When used, will run recon-all and atlases generation from t1 volumes.
 
 connectomics                                    When used, will perform connectivity analysis between atlas-based 
                                                 segmentation.
@@ -215,7 +223,7 @@ Singularity container is used.
 The intermediate working directory is, by default, set to './work'.
 To change it, use the '-w WORK_DIR' argument.
 
-The default config file is tractoflow/nextflow.config.
+The default config file is ChildBrainFlow/nextflow.config.
 Use '-C config_file.config' to specify a non-default configuration file.
 The '-C config_file.config' must be inserted after the nextflow call
 like 'nextflow -C config_file.config run ...'.

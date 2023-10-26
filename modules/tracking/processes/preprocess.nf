@@ -10,6 +10,9 @@ process BET_DWI {
         tuple val(sid), path(dwi), path(bval), path(bvec)
     output:
         tuple val(sid), path("${sid}__dwi_bet.nii.gz"), emit: bet_dwi
+    when:
+        !params.skip_dwi_preprocessing
+
     script:
     // ** Using a combination of preliminary bet, powder average computation and then final bet. ** //
     // ** This might not be necessary for good quality data, but returns much more robust results on ** //
@@ -62,6 +65,9 @@ process DENOISING {
         tuple val(sid), path(dwi)
     output:
         tuple val(sid), path("${sid}__dwi_denoised.nii.gz"), emit: denoised_dwi
+    when:
+        !params.skip_dwi_preprocessing
+    
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -81,6 +87,9 @@ process TOPUP {
     output:
         tuple val(sid), path("${sid}__corrected_b0s.nii.gz"), path("${params.topup_prefix}_fieldcoef.nii.gz"),
         path("${params.topup_prefix}_movpar.txt"), emit: topup_result
+    when:
+        !params.skip_dwi_preprocessing
+
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -114,6 +123,9 @@ process EDDY_TOPUP {
         tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), path("${sid}__bval_eddy"), 
         path("${sid}__dwi_eddy_corrected.bvec"), emit: dwi_bval_bvec
         tuple val(sid), path("${sid}__b0_bet_mask.nii.gz"), emit: b0_mask
+    when:
+        !params.skip_dwi_preprocessing
+
     script:
     slice_drop_flag=""
     if (params.use_slice_drop_correction)
@@ -147,6 +159,9 @@ process N4 {
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
     output:
         tuple val(sid), path("${sid}__dwi_n4.nii.gz"), emit: dwi_n4
+    when:
+        !params.skip_dwi_preprocessing
+
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
@@ -311,6 +326,7 @@ process RESAMPLE_ANAT {
         tuple val(sid), path("${sid}__t2w_resampled.nii.gz"), path("${sid}__mask_resampled.nii.gz"), emit: t2w_and_mask
     when:
         params.infant_config
+        
     script:
     """
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
@@ -334,6 +350,9 @@ process NORMALIZE {
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
     output:
         tuple val(sid), path("${sid}__dwi_normalized.nii.gz"), emit: dwi_normalized
+    when:
+        !params.skip_dwi_preprocessing
+
     script:
     if (params.dti_shells)
     """
@@ -408,6 +427,26 @@ process EXTRACT_B0 {
     scil_extract_b0.py $dwi $bval $bvec ${sid}__b0_resampled.nii.gz --mean\
         --b0_thr $params.b0_thr --force_b0_threshold
     mrthreshold ${sid}__b0_resampled.nii.gz ${sid}__b0_mask_resampled.nii.gz\
+        --abs 0.00001 -nthreads 1
+    """
+}
+
+process DWI_MASK {
+    cpus 1
+
+    input:
+        tuple val(sid), path(dwi), path(bval), path(bvec)
+    output:
+        tuple val(sid), path("${sid}__b0_mask.nii.gz"), emit: dwi_mask
+    
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_extract_b0.py $dwi $bval $bvec b0.nii.gz --mean\
+        --b0_thr $params.b0_thr --force_b0_threshold
+    mrthreshold b0.nii.gz ${sid}__b0_mask.nii.gz\
         --abs 0.00001 -nthreads 1
     """
 }

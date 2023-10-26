@@ -1,41 +1,52 @@
 
-DWI Pipeline
-========================
+ChildBrainFlow Pipeline
+=======================
 
-Pipeline adapted from the SCIL Tractoflow pipeline (https://github.com/scilus/tractoflow.git) [1].
-Made for use on newborn diffusion MRI data.
+ChildBrainFlow is an end-to-end pipeline that performs tractography, t1 reconstruction and connectomics.
+It is essentially a merged version of multiple individual pipeline to avoid the handling of inputs/outputs
+between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
+process have been taken: 
 
-This pipeline performs tractography on newborn dMRI data using already segmented WM and brain
-mask. Those mask can come from any structural segmentation pipeline (dHCP, Infant-Freesurfer,
-Neocivet, etc.). It is RECOMMENDED to provide an already brain-extracted T2w volume, but if
-it is not the case, please use the --run_bet_t2w option.
+    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
+    3. Connectoflow (https://github.com/scilus/connectoflow)
 
-To simply perform tractography, use -profile tracking. The pipeline will only perform the tracking
-related processes. 
+*** Please note that some steps have been removed from the original pipelines if they were not relevant ***
+*** for pediatric data. If you need some of these steps, please use the original pipelines. ***
 
-It is possible to also run a connectivity analysis following tracking. Using -profile connectomics, 
-the pipeline will perform connectivity analysis based on atlas segmentation. The connectomics processes 
-are imported from the Connectoflow pipeline (https://github.com/scilus/connectoflow.git). If you are using
-only the connectomics profile, you need to provide all the necessary files to transform labels, run commit,
-run afd_fixel and compute metrics (see structure below).
+Steps Selection
+---------------
 
-Both analysis (tracking and connectomics) can be performed one after another automatically (using
--profile tracking,connectomics). The pipeline will then reorganised channel to provide the correct inputs.
+It is possible to choose which part of the pipeline will be run by using the -profile parameter. Depending
+on which -profile is selected, input files will differ. To get a list of the required input files, use this 
+command:
+
+    nextflow run ChildBrainFlow/main.nf --help -profile {desired_profile}
+
+Available Profiles
+------------------
+
+Here is a list of available profiles: 
+
+    1. tracking :           If selected, preprocessing of DWI and Anatomical data will be performed followed by
+                            local modelling and tractography (see [1] for details).
+    2. connectomics :       If selected, labels registration, tractogram segmentation and connectivity will be 
+                            performed.
+    3. freesurfer :         If selected, FreeSurfer Recon-all will be run on input T1s and label files will be 
+                            generated (available atlases: freesurfer, brainnetome and glasser). Only available
+                            if T1 volume is supplied as input (therefore, not with -profile infant). 
+    4. infant :             If selected, the pipeline will assume the data is from infant patients (< 2 years old)
+                            and adapt some parameters to perform tractography and connectomics.
+
+Multiple profiles can be selected at the same time, the pipeline will simply organised channels to seemlessly
+connect each steps. 
+
+To view the required input files, select all the profiles you want to run (ex: tracking, connectomics and infant) 
+and run this command : 
+
+    nextflow run ChildBrainFlow/main.nf --help -profile tracking,connectomics,infant
 
 [1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
     TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
     leveraging Nextflow & Singularity, NeuroImage,
     https://doi.org/10.1016/j.neuroimage.2020.116889.
-
-
-Run Tracking Pipeline
-
-nextflow run main.nf [OPTIONAL_ARGUMENTS] --input [input_folder] -profile tracking
-
-Run Connectomics Pipeline
-
-nextflow run main.nf [OPTIONAL_ARGUMENTS] --input [input_folder] -profile connectomics
-
-Run Both Pipeline
-
-nextflow run main.nf [OPTIONAL_ARGUMENTS] --input [input_folder] -profile tracking,connectomics
