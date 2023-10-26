@@ -13,7 +13,7 @@ jobs:
           remove-codeql: 'true'
           remove-android: 'true'
           remove-dotnet: 'true'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: eWaterCycle/setup-apptainer@v2.0.0
       - uses: nf-core/setup-nextflow@v1
       - name: Build Docker Image.
@@ -21,7 +21,7 @@ jobs:
           docker build -t childbrainflow_image ${GITHUB_WORKSPACE}/containers/.
       - name: Build Singularity Image.
         run: |
-          singularity build childbrainflow_image.sif ${GITHUB_WORKSPACE}/containers/singularity_recipe.def
+          apptainer build childbrainflow_image.sif ${GITHUB_WORKSPACE}/containers/singularity_recipe.def
       - name: Run pipeline with Docker
         run: |
           nextflow run ${GITHUB_WORKSPACE} --help -with-docker childbrainflow_image
