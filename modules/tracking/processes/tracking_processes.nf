@@ -125,7 +125,7 @@ process LOCAL_TRACKING {
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     scil_compute_local_tracking.py $fodf $seeding_mask $tracking_mask\
-        tmp.trk --algo $params.local_algo --$params.local_seeding $params.local_nb_seeds\
+        tmp.trk --algo $params.local_algo --$params.local_seeding $params.local_nbr_seeds\
         --seed $params.local_tracking_seed --step $params.local_step_size --theta $params.local_theta\
         --sfthres $params.local_sfthres --min_length $params.local_min_len\
         --max_length $params.local_max_len $compress --sh_basis $params.basis

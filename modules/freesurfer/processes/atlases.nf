@@ -9,8 +9,9 @@ process FS_BN_GL_SF {
         tuple val(sid), path(folder)
 
     output:
-        tuple val(sid), path("*[brainnetome]*.nii.gz"), emit: brainnetome
         tuple val(sid), path("*[freesurfer]*.nii.gz"), emit: freesurfer
+        tuple val(sid), path("*[brainnetome]*.nii.gz"), emit: brainnetome
+        tuple val(sid), path("*[glasser]*.nii.gz"), emit: glasser
         tuple val(sid), path("*[schaefer_100]*.nii.gz"), emit: schaefer_100
         tuple val(sid), path("*[schaefer_200]*.nii.gz"), emit: schaefer_200
         tuple val(sid), path("*[schaefer_400]*.nii.gz"), emit: schaefer_400

@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: scilus/scilus:1.5.0
+From: scilus/scilus-flows:1.5.0
 
 %labels
     version ChildBrainFlow-1.0.0
@@ -16,9 +16,15 @@ From: scilus/scilus:1.5.0
     apt-get update
     apt-get install -y csh tcsh
 
+    # Download additional files
+    wget -O /root/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
+    wget -O /root/FS_BN_GL_SF_utils.tar https://www.dropbox.com/s/zzptxby9pf5lpih/FS_BN_GL_SF_utils.tar?dl=0?download=1
+    tar -xvf FS_BN_GL_SF_utils.tar
+    rm FS_BN_GL_SF_utils.tar
+    
     # Setup FreeSurfer environment
     export OS=Linux
-    export PATH=/usr/local/freesurfer/bin:/usr/local/freesurfer/fsfast/bin:/usr/local/freesurfer/tktools:/usr/local/freesurfer/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    export PATH=${PATH}:/usr/local/freesurfer/bin:/usr/local/freesurfer/fsfast/bin:/usr/local/freesurfer/tktools:/usr/local/freesurfer/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     export FREESURFER_HOME=/usr/local/freesurfer
     export FREESURFER=/usr/local/freesurfer
     export SUBJECTS_DIR=/usr/local/freesurfer/subjects
@@ -26,6 +32,7 @@ From: scilus/scilus:1.5.0
     export FSFAST_HOME=/usr/local/freesurfer/fsfast
     export FMRI_ANALYSIS_DIR=/usr/local/freesurfer/fsfast
     export FUNCTIONALS_DIR=/usr/local/freesurfer/sessions
+    export FS_LICENSE=/root/license.txt
 
     # Set default FreeSurfer options
     export FS_OVERRIDE=0
@@ -40,16 +47,9 @@ From: scilus/scilus:1.5.0
     export MNI_PERL5LIB=/usr/local/freesurfer/mni/share/perl5
     export PERL5LIB=/usr/local/freesurfer/mni/share/perl5
 
-
-    # Download additional files
-    wget -O /freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
-    wget -O /root/FS_BN_GL_SF_utils.tar https://www.dropbox.com/s/zzptxby9pf5lpih/FS_BN_GL_SF_utils.tar?dl=0?download=1
-    tar -xvf FS_BN_GL_SF_utils.tar
-    rm FS_BN_GL_SF_utils.tar
-
 %environment
     export OS=Linux
-    export PATH=/usr/local/freesurfer/bin:/usr/local/freesurfer/fsfast/bin:/usr/local/freesurfer/tktools:/usr/local/freesurfer/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    export PATH=${PATH}:/usr/local/freesurfer/bin:/usr/local/freesurfer/fsfast/bin:/usr/local/freesurfer/tktools:/usr/local/freesurfer/mni/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     export FREESURFER_HOME=/usr/local/freesurfer
     export FREESURFER=/usr/local/freesurfer
     export SUBJECTS_DIR=/usr/local/freesurfer/subjects
@@ -66,3 +66,4 @@ From: scilus/scilus:1.5.0
     export MNI_DATAPATH=/usr/local/freesurfer/mni/data
     export MNI_PERL5LIB=/usr/local/freesurfer/mni/share/perl5
     export PERL5LIB=/usr/local/freesurfer/mni/share/perl5
+    export FS_LICENSE=/root/license.txt
