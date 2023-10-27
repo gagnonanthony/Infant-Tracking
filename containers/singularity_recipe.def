@@ -44,7 +44,7 @@ From: scilus/scilus:1.5.0
     # Download additional files
     wget -O /freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
     wget -O /root/FS_BN_GL_SF_utils.tar https://www.dropbox.com/s/zzptxby9pf5lpih/FS_BN_GL_SF_utils.tar?dl=0?download=1
-    tar -xzvf FS_BN_GL_SF_utils.tar
+    tar -xvf FS_BN_GL_SF_utils.tar
     rm FS_BN_GL_SF_utils.tar
 
 %environment

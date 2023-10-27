@@ -5,28 +5,8 @@ jobs:
   pipeline-compilation:
     runs-on: ubuntu-latest
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
-          remove-codeql: 'true'
-          remove-android: 'true'
-          remove-dotnet: 'true'
-      - uses: actions/checkout@v3
-      - uses: eWaterCycle/setup-apptainer@v2.0.0
+      - uses: actions/checkout@v4
       - uses: nf-core/setup-nextflow@v1
-      - name: Docker Setup Buildx
-        uses: docker/setup-buildx-action@v3.0.0
-      - name: Build Docker Image.
+      - name: Run pipeline
         run: |
-          docker buildx build -t childbrainflow_image ${GITHUB_WORKSPACE}/containers/.
-      - name: Build Singularity Image.
-        run: |
-          apptainer build childbrainflow_image.sif ${GITHUB_WORKSPACE}/containers/singularity_recipe.def
-      - name: Run pipeline with Docker
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} --help -with-docker childbrainflow_image
-      - name: Run pipeline with Singularity
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} --help -with-singularity childbrainflow_image.sif
+          nextflow run ${GITHUB_WORKSPACE} --help 
