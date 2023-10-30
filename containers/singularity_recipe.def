@@ -17,10 +17,17 @@ From: scilus/scilus-flows:1.5.0
     apt-get install -y csh tcsh
 
     # Download additional files
-    wget -O /root/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
-    wget -O /root/FS_BN_GL_SF_utils.tar https://www.dropbox.com/s/zzptxby9pf5lpih/FS_BN_GL_SF_utils.tar?dl=0?download=1
-    tar -xvf FS_BN_GL_SF_utils.tar
+    wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
+    wget -O FS_BN_GL_SF_utils.tar.gz https://www.dropbox.com/scl/fi/izy3yie5cdqqi7my2ogfa/FS_BN_GL_SF_utils.tar.gz?rlkey=kt8qi4ye7h3om3ymnq0n0h570&dl=0
+    tar -xvf FS_BN_GL_SF_utils.tar -C ${APPTAINER_ROOTFS}/
     rm FS_BN_GL_SF_utils.tar
+
+    # Setup parallel
+    wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
+    tar xjf parallel-latest.tar.bz2
+    cd parallel-* && ./configure 
+    make && make install
+    echo 'will cite' | parallel --citation 1> /dev/null 2> /dev/null &
     
     # Setup FreeSurfer environment
     export OS=Linux
@@ -32,7 +39,7 @@ From: scilus/scilus-flows:1.5.0
     export FSFAST_HOME=/usr/local/freesurfer/fsfast
     export FMRI_ANALYSIS_DIR=/usr/local/freesurfer/fsfast
     export FUNCTIONALS_DIR=/usr/local/freesurfer/sessions
-    export FS_LICENSE=/root/license.txt
+    export FS_LICENSE=/usr/local/freesurfer/license.txt
 
     # Set default FreeSurfer options
     export FS_OVERRIDE=0
@@ -66,4 +73,4 @@ From: scilus/scilus-flows:1.5.0
     export MNI_DATAPATH=/usr/local/freesurfer/mni/data
     export MNI_PERL5LIB=/usr/local/freesurfer/mni/share/perl5
     export PERL5LIB=/usr/local/freesurfer/mni/share/perl5
-    export FS_LICENSE=/root/license.txt
+    export FS_LICENSE=/usr/local/freesurfer/license.txt
