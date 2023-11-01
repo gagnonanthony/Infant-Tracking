@@ -195,19 +195,25 @@ if (!params.help) {
 
 def display_usage () {
     
-    if (params.run_tracking && !params.infant_config) { 
+    if (params.run_tracking && !params.infant_config && !params.run_connectomics && !params.run_freesurfer ) { 
         usage = file("$projectDir/modules/tracking/USAGE")
-    } 
-    else if (params.run_tracking && params.infant_config) {
+    } else if (params.run_tracking && params.infant_config && !params.run_connectomics && !params.run_freesurfer ) {
         usage = file("$projectDir/modules/tracking/USAGE_INFANT")
-    }
-    else if (params.run_connectomics && !params.infant_config) {
+    } else if (params.run_connectomics && !params.infant_config && !params.run_tracking && !params.run_freesurfer ) {
         usage = file("$projectDir/modules/connectomics/USAGE")
-    }
-    else if (params.run_connectomics && params.infant_config) {
+    } else if (params.run_connectomics && params.infant_config && !params.run_tracking && !params.run_freesurfer ) {
         usage = file("$projectDir/modules/connectomics/USAGE_INFANT")
-    }
-    else {
+    } else if ( params.run_tracking && params.run_connectomics && !params.infant_config && !params.run_freesurfer ) {
+        usage = file("$projectDir/modules/connectomics/USAGE_TRACKING")
+    } else if ( params.run_tracking && params.run_connectomics && params.infant_config && !params.run_freesurfer ) {
+        usage = file("$projectDir/modules/connectomics/USAGE_TRACKING_INFANT")
+    } else if ( params.run_freesurfer && !params.run_tracking && !params.run_connectomics ) {
+        usage = file("$projectDir/modules/freesurfer/USAGE")
+    } else if ( params.run_freesurfer && !params.run_tracking && params.run_connectomics ) {
+        usage = file("$projectDir/modules/freesurfer/USAGE_CONN")
+    } else if ( params.run_freesurfer && params.run_tracking && params.run_connectomics ) {
+        usage = file("$projectDir/modules/connectomics/USAGE_ALL")
+    } else {
         usage = file("$projectDir/USAGE")
     }    
 

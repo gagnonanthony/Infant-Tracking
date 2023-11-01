@@ -7,18 +7,12 @@ It is essentially a merged version of multiple individual pipeline to avoid the 
 between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
 process have been taken: 
 
-    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    1. TractoFlow (https://github.com/scilus/tractoflow.git)
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
 *** Please note that some steps have been removed from the original pipelines if they were not relevant ***
 *** for pediatric data. If you need some of these steps, please use the original pipelines. ***
-
-[1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
-    TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
-    leveraging Nextflow & Singularity, NeuroImage,
-    https://doi.org/10.1016/j.neuroimage.2020.116889.
-
 
 Run FreeSurferFlow Pipeline
 
@@ -64,8 +58,8 @@ OPTIONAL ARGUMENTS (current value)
 
 [FREESURFERFLOW OPTIONS]
 
-    --atlas_utils_folder                        Folder needed to convert freesurfer atlas to other atlases
-                                                ($atlas_util_folder)
+    --atlas_utils_folder                        Folder needed to convert freesurfer atlas to other atlases. Default is
+                                                the path of folder within the container. ($atlas_utils_folder)
     --nb_threads                                Number of threads used by recon-all and the atlases creation
                                                 ($nb_threads)
     --compute_FS_BN_GL_SF                       Compute the connectivity-friendly atlases : ($compute_FS_BN_GL_SF)
@@ -78,6 +72,12 @@ OPTIONAL ARGUMENTS (current value)
     --compute_lobes                             Compute the lobes atlas. ($compute_lobes)
     --processes                                 The number of parallel processes to launch ($cpu_count).
                                                 Only affects the local scheduler.
+
+[GLOBAL OPTIONS]
+
+    OUTPUT OPTIONS
+    --output_dir                                Directory to write the final results. Default is 
+                                                "./Results_ChildBrainFlow/".
 
 AVAILABLE PROFILES (using -profile option (e.g. -profile no_symlink,macos,tracking))
 

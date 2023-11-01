@@ -7,7 +7,7 @@ It is essentially a merged version of multiple individual pipeline to avoid the 
 between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
 process have been taken: 
 
-    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    1. TractoFlow (https://github.com/scilus/tractoflow.git)
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
@@ -45,8 +45,3 @@ To view the required input files, select all the profiles you want to run (ex: t
 and run this command : 
 
     nextflow run ChildBrainFlow/main.nf --help -profile tracking,connectomics,infant
-
-[1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
-    TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
-    leveraging Nextflow & Singularity, NeuroImage,
-    https://doi.org/10.1016/j.neuroimage.2020.116889.

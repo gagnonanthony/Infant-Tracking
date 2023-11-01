@@ -7,18 +7,12 @@ It is essentially a merged version of multiple individual pipeline to avoid the 
 between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
 process have been taken: 
 
-    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    1. TractoFlow (https://github.com/scilus/tractoflow.git)
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
 *** Please note that some steps have been removed from the original pipelines if they were not relevant ***
 *** for pediatric data. If you need some of these steps, please use the original pipelines. ***
-
-[1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
-    TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
-    leveraging Nextflow & Singularity, NeuroImage,
-    https://doi.org/10.1016/j.neuroimage.2020.116889.
-
 
 Run Tracking Pipeline Infant Config
 
@@ -35,22 +29,14 @@ DESCRIPTION
                                                 |   ├-- *.bvec
                                                 |   ├-- *revb0.nii.gz
                                                 |   ├-- *t2w.nii.gz
-                                                |   ├-- *wm_mask.nii.gz
-                                                |   ├-- *labels.nii.gz          [Only if connectomics is also selected]
-                                                |   └-- metrics
-                                                |       └-- METRIC_NAME.nii.gz  [Optional, only if connectomics is also
-                                                |                                selected]
+                                                |   └-- *wm_mask.nii.gz
                                                 └-- S2
                                                     ├-- *dwi.nii.gz
                                                     ├-- *bval
                                                     ├-- *bvec
                                                     ├-- *revb0.nii.gz
                                                     ├-- *t2w.nii.gz
-                                                    ├-- *wm_mask.nii.gz
-                                                    ├-- *labels.nii.gz          [Only if connectomics is also selected]
-                                                    └-- metrics
-                                                        └-- METRIC_NAME.nii.gz  [Optional, only if connectomics is also
-                                                                                 selected]
+                                                    └-- *wm_mask.nii.gz
 
 OPTIONAL ARGUMENTS (current value)
 
@@ -160,7 +146,7 @@ OPTIONAL ARGUMENTS (current value)
     --local_erosion                             Number of voxel to remove from brain mask. Use to remove aberrant
                                                 voxel in fa maps. ($local_erosion)
     --local_algo                                Tracking algorithm [prob, det]. ($local_algo)
-    --local_nb_seeds                            Number of seeds related to the seeding type param. ($local_nb_seeds)
+    --local_nbr_seeds                            Number of seeds related to the seeding type param. ($local_nbr_seeds)
     --local_seeding                             Seeding type [npv, nt]. ($local_seeding)
     --local_step_size                           Step size ($local_step_size)
     --local_theta                               Maximum angle between 2 steps. ($local_theta)                         
@@ -179,7 +165,7 @@ OPTIONAL ARGUMENTS (current value)
                                                 ($pft_fa_seeding_mask_thr)
     --pft_seeding_mask_type                     Seeding mask type [fa, wm]. ($pft_seeding_mask_type)
     --pft_algo                                  Tracking algorithm [prob, det]. ($pft_algo)
-    --pft_nb_seeds                              Number of seeds related to the seeding type param. ($pft_nb_seeds)
+    --pft_nbr_seeds                              Number of seeds related to the seeding type param. ($pft_nbr_seeds)
     --pft_seeding                               Seeding type [npv, nt]. ($pft_seeding)
     --pft_step_size                             Step size ($pft_step_size)
     --pft_theta                                 Maximum angle between 2 steps. ($pft_theta)                         
@@ -203,7 +189,7 @@ OPTIONAL ARGUMENTS (current value)
 
     OUTPUT OPTIONS
     --output_dir                                Directory to write the final results. Default is 
-                                                "./Results_Infant_Tracking/".
+                                                "./Results_ChildBrainFlow/".
 
 AVAILABLE PROFILES (using -profile option (e.g. -profile no_symlink,macos,tracking))
 

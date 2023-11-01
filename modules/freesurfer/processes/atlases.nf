@@ -9,12 +9,12 @@ process FS_BN_GL_SF {
         tuple val(sid), path(folder)
 
     output:
-        tuple val(sid), path("*[freesurfer]*.nii.gz"), emit: freesurfer
-        tuple val(sid), path("*[brainnetome]*.nii.gz"), emit: brainnetome
-        tuple val(sid), path("*[glasser]*.nii.gz"), emit: glasser
-        tuple val(sid), path("*[schaefer_100]*.nii.gz"), emit: schaefer_100
-        tuple val(sid), path("*[schaefer_200]*.nii.gz"), emit: schaefer_200
-        tuple val(sid), path("*[schaefer_400]*.nii.gz"), emit: schaefer_400
+        tuple val(sid), path("*freesurfer*.nii.gz"), emit: freesurfer
+        tuple val(sid), path("*brainnetome*.nii.gz"), emit: brainnetome
+        tuple val(sid), path("*glasser*.nii.gz"), emit: glasser
+        tuple val(sid), path("*schaefer_100*.nii.gz"), emit: schaefer_100
+        tuple val(sid), path("*schaefer_200*.nii.gz"), emit: schaefer_200
+        tuple val(sid), path("*schaefer_400*.nii.gz"), emit: schaefer_400
         path("*[brainnetome,freesurfer,glasser,schaefer]*.txt")
         path("*[brainnetome,freesurfer,glasser,schaefer]*.json")
 
@@ -80,11 +80,11 @@ process LAUSANNE {
         each scale
 
     output:
-        tuple val(sid), path("[lausanne_2008_scale_1]*.nii.gz"), emit: lausanne_1
-        tuple val(sid), path("[lausanne_2008_scale_2]*.nii.gz"), emit: lausanne_2
-        tuple val(sid), path("[lausanne_2008_scale_3]*.nii.gz"), emit: lausanne_3
-        tuple val(sid), path("[lausanne_2008_scale_4]*.nii.gz"), emit: lausanne_4
-        tuple val(sid), path("[lausanne_2008_scale_5]*.nii.gz"), emit: lausanne_5
+        tuple val(sid), path("lausanne_2008_scale_1*.nii.gz"), emit: lausanne_1
+        tuple val(sid), path("lausanne_2008_scale_2*.nii.gz"), emit: lausanne_2
+        tuple val(sid), path("lausanne_2008_scale_3*.nii.gz"), emit: lausanne_3
+        tuple val(sid), path("lausanne_2008_scale_4*.nii.gz"), emit: lausanne_4
+        tuple val(sid), path("lausanne_2008_scale_5*.nii.gz"), emit: lausanne_5
         path("*.txt")
         path("*.json")
     

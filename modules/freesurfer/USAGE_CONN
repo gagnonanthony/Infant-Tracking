@@ -14,11 +14,12 @@ process have been taken:
 *** Please note that some steps have been removed from the original pipelines if they were not relevant ***
 *** for pediatric data. If you need some of these steps, please use the original pipelines. ***
 
-Run Connectomics Pipeline
+Run FreeSurferFlow Pipeline
 
-nextflow run main.nf [OPTIONAL_ARGUMENTS] --input [input_folder] -profile connectomics
+nextflow run main.nf [OPTIONAL_ARGUMENTS] --input [input_folder] -profile freesurfer,connectomics
 
 DESCRIPTION
+
 
     --input=/path/to/[input_folder]             Input folder containing multiple subjects
 
@@ -27,9 +28,8 @@ DESCRIPTION
                                                 |   ├-- *dwi.nii.gz
                                                 |   ├-- *.bval
                                                 |   ├-- *.bvec
-                                                |   |-- *t1.nii.gz              [Registered to diff space.]
+                                                |   |-- *t1.nii.gz              [Raw t1 image.]
                                                 |   ├-- *.trk
-                                                |   ├-- *labels.nii.gz          [Native t1 space]
                                                 |   ├-- *peaks.nii.gz
                                                 |   ├-- *fodf.nii.gz
                                                 |   ├-- OGenericAffine.mat
@@ -40,15 +40,59 @@ DESCRIPTION
                                                     ├-- *dwi.nii.gz
                                                     ├-- *bval
                                                     ├-- *bvec
-                                                    |-- *t1.nii.gz              [Registered to diff space.]
+                                                    |-- *t1.nii.gz              [Raw t1 image.]
                                                     ├-- *.trk
-                                                    ├-- *labels.nii.gz          [Native t1 space]
                                                     ├-- *peaks.nii.gz
                                                     ├-- *fodf.nii.gz
                                                     ├-- OGenericAffine.mat
                                                     ├-- output1Warp.nii.gz
                                                     └-- metrics
                                                         └-- METRIC_NAME.nii.gz  [Optional]
+
+    --use_freesurfer_atlas                      If set, will use the freesurfer atlas if -profile connectomics is used.
+                                                ($use_freesurfer_atlas)
+    --use_brainnetome_atlas                     If set, will use the brainnetome atlas if -profile connectomics is used.
+                                                This is the default setting. ($use_brainnetome_atlas)
+    --use_glasser_atlas                         If set, will use the Glasser atlas if -profile connectomics is used.
+                                                ($use_glasser_atlas)
+    --use_schaefer_100_atlas                    If set, will use the Schaefer 100 atlas if -profile connectomics is used.
+                                                ($use_schaefer_100_atlas)
+    --use_schaefer_200_atlas                    If set, will use the Schaefer 200 atlas if -profile connectomics is used.
+                                                ($use_schaefer_200_atlas)
+    --use_schaefer_400_atlas                    If set, will use the Schaefer 400 atlas if -profile connectomics is used.
+                                                ($use_schaefer_400_atlas)
+    --use_lausanne_1_atlas                      If set, will use the lausanne scale 1 atlas if -profile connectomics is
+                                                used. ($use_lausanne_1_atlas)
+    --use_lausanne_2_atlas                      If set, will use the lausanne scale 1 atlas if -profile connectomics is
+                                                used. ($use_lausanne_2_atlas)
+    --use_lausanne_3_atlas                      If set, will use the lausanne scale 1 atlas if -profile connectomics is
+                                                used. ($use_lausanne_3_atlas)
+    --use_lausanne_4_atlas                      If set, will use the lausanne scale 1 atlas if -profile connectomics is
+                                                used. ($use_lausanne_4_atlas)
+    --use_lausanne_5_atlas                      If set, will use the lausanne scale 1 atlas if -profile connectomics is
+                                                used. ($use_lausanne_5_atlas)
+    --use_dilated_labels                        If set, will use the dilated version of the atlas selected above. 
+                                                ($use_dilated_labels)
+
+
+OPTIONAL ARGUMENTS (current value)
+
+[FREESURFERFLOW OPTIONS]
+
+    --atlas_utils_folder                        Folder needed to convert freesurfer atlas to other atlases. Default is
+                                                the path of folder within the container. ($atlas_utils_folder)
+    --nb_threads                                Number of threads used by recon-all and the atlases creation
+                                                ($nb_threads)
+    --compute_FS_BN_GL_SF                       Compute the connectivity-friendly atlases : ($compute_FS_BN_GL_SF)
+                                                    * FreeSurfer (adapted)
+                                                    * Brainnetome
+                                                    * Glasser
+                                                    * Schaefer (100/200/400)
+    --compute_lausanne_multiscale               Compute the connectivity multiscale atlases from Lausanne
+                                                ($compute_lausanne_multiscale)
+    --compute_lobes                             Compute the lobes atlas. ($compute_lobes)
+    --processes                                 The number of parallel processes to launch ($cpu_count).
+                                                Only affects the local scheduler.
 
 [CONNECTOMICS OPTIONS]
 

@@ -109,11 +109,13 @@ workflow ANAT {
         anat_channel
 
     main: 
-        // ** Denoising ** //
-        DENOISE_T1(anat_channel)
+        if ( ! params.infant_config ) {
+            // ** Denoising ** //
+            DENOISE_T1(anat_channel)
 
-        // ** N4 ** //
-        N4_T1(DENOISE_T1.out.t1_denoised)
+            // ** N4 ** //
+            N4_T1(DENOISE_T1.out.t1_denoised)  
+        }
 
         // ** Resampling ** //
         if ( params.infant_config ) {

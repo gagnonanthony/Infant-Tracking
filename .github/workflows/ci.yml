@@ -10,3 +10,12 @@ jobs:
       - name: Run pipeline
         run: |
           nextflow run ${GITHUB_WORKSPACE} --help 
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile tracking
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile tracking,infant
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile connectomics
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile connectomics,infant
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile tracking,connectomics
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile tracking,connectomics,infant
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile freesurfer
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile freesurfer,connectomics
+          nextflow run ~/code/Repositories/Infant-DWI/main.nf --help -profile freesurfer,connectomics,tracking

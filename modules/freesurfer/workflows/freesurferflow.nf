@@ -41,8 +41,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.freesurfer
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_brainnetome_atlas ) {
+        } else if ( params.use_brainnetome_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = FS_BN_GL_SF.out.brainnetome
                                     .map{ [it[0], it[2]] }
@@ -50,8 +49,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.brainnetome
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_glasser_atlas ) {
+        } else if ( params.use_glasser_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = FS_BN_GL_SF.out.glasser
                                     .map{ [it[0], it[2]] }
@@ -59,8 +57,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.glasser
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_schaefer_100_atlas ) {
+        } else if ( params.use_schaefer_100_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = FS_BN_GL_SF.out.schaefer_100
                                     .map{ [it[0], it[2]] }
@@ -68,8 +65,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.schaefer_100
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_schaefer_200_atlas ) {
+        } else if ( params.use_schaefer_200_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = FS_BN_GL_SF.out.schaefer_200
                                     .map{ [it[0], it[2]] }
@@ -77,8 +73,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.schaefer_200
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_schaefer_400_atlas ) {
+        } else if ( params.use_schaefer_400_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = FS_BN_GL_SF.out.schaefer_400
                                     .map{ [it[0], it[2]] }
@@ -86,8 +81,7 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.schaefer_400
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_lausanne_1_atlas ) {
+        } else if ( params.use_lausanne_1_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = LAUSANNE.out.lausanne_1
                                     .map{ [it[0], it[2]] }
@@ -95,8 +89,7 @@ workflow FREESURFERFLOW {
                 labels = LAUSANNE.out.lausanne_1
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_lausanne_2_atlas ) {
+        } else if ( params.use_lausanne_2_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = LAUSANNE.out.lausanne_2
                                     .map{ [it[0], it[2]] }
@@ -104,8 +97,7 @@ workflow FREESURFERFLOW {
                 labels = LAUSANNE.out.lausanne_2
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_lausanne_3_atlas ) {
+        } else if ( params.use_lausanne_3_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = LAUSANNE.out.lausanne_3
                                     .map{ [it[0], it[2]] }
@@ -113,8 +105,7 @@ workflow FREESURFERFLOW {
                 labels = LAUSANNE.out.lausanne_3
                                     .map{ [it[0], it[1]] }
             }
-        } 
-        if ( params.use_lausanne_4_atlas ) {
+        } else if ( params.use_lausanne_4_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = LAUSANNE.out.lausanne_4
                                     .map{ [it[0], it[2]] }
@@ -122,8 +113,7 @@ workflow FREESURFERFLOW {
                 labels = LAUSANNE.out.lausanne_4
                                     .map{ [it[0], it[1]] }
             }
-        }
-        if ( params.use_lausanne_5_atlas ) {
+        } else if ( params.use_lausanne_5_atlas ) {
             if ( params.use_dilated_labels ) {
                 labels = LAUSANNE.out.lausanne_5
                                     .map{ [it[0], it[2]] }

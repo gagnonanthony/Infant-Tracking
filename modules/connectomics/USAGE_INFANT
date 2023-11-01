@@ -7,18 +7,12 @@ It is essentially a merged version of multiple individual pipeline to avoid the 
 between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which 
 process have been taken: 
 
-    1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
+    1. TractoFlow (https://github.com/scilus/tractoflow.git)
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
 *** Please note that some steps have been removed from the original pipelines if they were not relevant ***
 *** for pediatric data. If you need some of these steps, please use the original pipelines. ***
-
-[1] Theaud, G., Houde, J.-C., Boré, A., Rheault, F., Morency, F., Descoteaux, M.,
-    TractoFlow: A robust, efficient and reproducible diffusion MRI pipeline
-    leveraging Nextflow & Singularity, NeuroImage,
-    https://doi.org/10.1016/j.neuroimage.2020.116889.
-
 
 Run Connectomics Pipeline Infant Config
 
@@ -79,6 +73,7 @@ DESCRIPTION
     --ball_stick                                If set, will use the ball&stick model and disable the zeppelin 
                                                 compartment for single-shell data. ($ball_stick)
     --para_diff                                 Parallel diffusivity in mm^2/s ($para_diff)
+    --perp_diff                                 Perpendicular diffusivity in mm^2/s ($perp_diff)
     --iso_diff                                  Isotropic diffusivity in mm^2/s ($iso_diff)
 
     PROCESSES OPTIONS
@@ -92,7 +87,7 @@ DESCRIPTION
 
     OUTPUT OPTIONS
     --output_dir                                Directory to write the final results. Default is 
-                                                "./Results_Infant_Tracking/".
+                                                "./Results_ChildBrainFlow/".
 
 AVAILABLE PROFILES (using -profile option (e.g. -profile no_symlink,macos,tracking))
 
