@@ -2,9 +2,9 @@ FROM scilus/scilus-flows:1.5.0
 
 LABEL version="ChildBrainFlow-1.0.0"
 
-RUN wget https://www.dropbox.com/scl/fi/izy3yie5cdqqi7my2ogfa/FS_BN_GL_SF_utils.tar.gz?rlkey=kt8qi4ye7h3om3ymnq0n0h570&dl=0 -O FS_BN_GL_SF_utils.tar.gz && \
-    tar -xvf FS_BN_GL_SF_utils.tar && \
-    rm FS_BN_GL_SF_utils.tar
+RUN wget -O FS_BN_GL_SF_utils.tar.gz "https://www.dropbox.com/scl/fi/6s1tc4eanf2sutejw7fkd/FS_BN_GL_SF_utils.tar.gz?rlkey=3gvhvpepv7ldkqef3go10cb5e&dl=0" && \
+    tar -xzvf FS_BN_GL_SF_utils.tar.gz && \
+    rm FS_BN_GL_SF_utils.tar.gz
 
 # Installing freesurfer on top of scilus:1.5.0
 WORKDIR /root
@@ -12,7 +12,7 @@ RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer
     tar --no-same-owner -xzvf fs.tar.gz && \
     mv freesurfer /usr/local && \
     rm fs.tar.gz
-COPY license.txt /usr/local/freesurfer/license.txt
+RUN wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
 RUN apt-get update && \
     apt-get install csh tcsh
 RUN wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2 \

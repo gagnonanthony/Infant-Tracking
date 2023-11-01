@@ -18,9 +18,9 @@ From: scilus/scilus-flows:1.5.0
 
     # Download additional files
     wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
-    wget -O FS_BN_GL_SF_utils.tar.gz https://www.dropbox.com/scl/fi/izy3yie5cdqqi7my2ogfa/FS_BN_GL_SF_utils.tar.gz?rlkey=kt8qi4ye7h3om3ymnq0n0h570&dl=0
-    tar -xvf FS_BN_GL_SF_utils.tar -C ${APPTAINER_ROOTFS}/
-    rm FS_BN_GL_SF_utils.tar
+    wget -O $APPTAINER_ROOTFS/FS_BN_GL_SF_utils.tar.gz https://www.dropbox.com/scl/fi/6s1tc4eanf2sutejw7fkd/FS_BN_GL_SF_utils.tar.gz?rlkey=3gvhvpepv7ldkqef3go10cb5e&dl=0 && \
+    tar -xzvf $APPTAINER_ROOTFS/FS_BN_GL_SF_utils.tar.gz && \
+    rm FS_BN_GL_SF_utils.tar.gz
 
     # Setup parallel
     wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
