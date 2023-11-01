@@ -460,7 +460,7 @@ def display_run_info () {
         log.info "SEEDING AND TRACKING OPTIONS"
         if ( params.run_pft_tracking ) {
             log.info "Algorithm for tracking: $params.pft_algo"
-            log.info "Number of seeds per voxel: $params.pft_nb_seeds"
+            log.info "Number of seeds per voxel: $params.pft_nbr_seeds"
             log.info "Seeding method: $params.pft_seeding"
             log.info "Step size: $params.pft_step_size"
             log.info "Theta threshold: $params.pft_theta"
@@ -470,7 +470,7 @@ def display_run_info () {
         }
         else {
             log.info "Algorithm for tracking: $params.local_algo"
-            log.info "Number of seeds per voxel: $params.local_nb_seeds"
+            log.info "Number of seeds per voxel: $params.local_nbr_seeds"
             log.info "Seeding method: $params.local_seeding"
             log.info "Step size: $params.local_step_size"
             log.info "Theta threshold: $params.local_theta"
