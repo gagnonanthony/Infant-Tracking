@@ -125,4 +125,5 @@ workflow FREESURFERFLOW {
 
     emit:
         labels
+        t1 = FREESURFER.out.final_t1
 }
