@@ -168,8 +168,10 @@ workflow {
 
             if ( params.run_freesurfer ) {
                 labels = FREESURFERFLOW.out.labels
+                anat = FREESURFERFLOW.out.t1
             } else {
                 labels = data.labels
+                anat = data.anat
             }
 
             metrics = data.metrics.transpose().groupTuple()
@@ -179,7 +181,7 @@ workflow {
                         data.dwi_peaks,
                         data.fodf,
                         metrics,
-                        data.t2w,
+                        anat,
                         data.transfos)
         }
     }
@@ -355,12 +357,11 @@ def display_usage () {
 
 def display_run_info () {
     log.info ""
-    log.info "Infant-DWI pipeline"
+    log.info "ChildBrainFlow pipeline"
     log.info "========================"
-    log.info "Pipeline adapted from the SCIL Tractoflow pipeline " 
-    log.info "(https://github.com/scilus/tractoflow.git) and the "
-    log.info "Connectoflow Pipeline (https://github.com/scilus/connectoflow.git)."
-    log.info "Made for use on newborn diffusion MRI data."
+    log.info "ChildBrainFlow is an end-to-end pipeline that performs tractography, t1 reconstruction and connectomics. " 
+    log.info "It is essentially a merged version of multiple individual pipeline to avoid the handling of inputs/outputs "
+    log.info "between flows with some parameters tuned for pediatric brain scans. "
     log.info ""
     log.info "Start time: $workflow.start"
     log.info ""
@@ -384,14 +385,21 @@ def display_run_info () {
         log.info "GLOBAL OPTIONS"
         log.info "Threshold for b0: $params.b0_thr"
         log.info "DWI Shell Tolerance: $params.dwi_shell_tolerance"
+        log.info "Skip DWI preprocessing: $params.skip_dwi_preprocessing"
         log.info ""
         log.info "BET DWI OPTIONS"
         log.info "Initial fractional value for BET: $params.initial_bet_f"
         log.info "Finale fractional value for BET: $params.final_bet_f"
         log.info ""
-        log.info "BET T2W OPTIONS"
-        log.info "Run BET on T2W image: $params.run_bet_anat"
-        log.info "Fractional value for T2W BET: $params.bet_anat_f"
+        if ( params.infant_config ) {
+            log.info "BET T2W OPTIONS"
+            log.info "Run BET on T2W image: $params.run_bet_anat"
+            log.info "Fractional value for T2W BET: $params.bet_anat_f"
+        }
+        else {
+            log.info "BET T1W OPTIONS"
+            log.info "T1 Tempalte: $params.template_t1"
+        }
         log.info ""
         log.info "EDDY AND TOPUP OPTIONS"
         log.info "Configuration for topup: $params.topup_config"
@@ -416,7 +424,12 @@ def display_run_info () {
         log.info "Interpolation method for DWI mask: $params.mask_dwi_interpolation"
         log.info ""
         log.info "EXTRACT DWI SHELLS OPTIONS"
-        log.info "Maximum DTI shell value: $params.max_dti_shell_value"
+        if ( params.dti_shells ) {
+            log.info "DTI shells: $params.dti_shells"
+        }
+        else {
+            log.info "Maximum DTI shell value: $params.max_dti_shell_value"
+        }
         log.info ""
         log.info "SH FITTING OPTIONS"
         log.info "Run SH fitting: $params.sh_fitting"
@@ -425,6 +438,7 @@ def display_run_info () {
         log.info ""
         log.info "FODF OPTIONS"
         log.info "Minimum fODF shell value: $params.min_fodf_shell_value"
+        log.info "FODF Metrics A factor: $params.fodf_metrics_a_factor"
         log.info "Maximum FA value in ventricles: $params.max_fa_in_ventricle"
         log.info "Minimum MD value in ventricles: $params.min_md_in_ventricle"
         log.info "Relative threshold (RT): $params.relative_threshold"
@@ -440,10 +454,10 @@ def display_run_info () {
         log.info "Set FRF: $params.set_frf"
         log.info "Manual FRF: $params.manual_frf"
         log.info ""
+        log.info "SEGMENT TISSUES OPTIONS"
+        log.info "Number of tissues: $params.number_of_tissues"
+        log.info ""
         log.info "SEEDING AND TRACKING OPTIONS"
-        log.info "Local tracking : $params.run_local_tracking"
-        log.info "PFT tracking: $params.run_pft_tracking"
-
         if ( params.run_pft_tracking ) {
             log.info "Algorithm for tracking: $params.pft_algo"
             log.info "Number of seeds per voxel: $params.pft_nb_seeds"
@@ -464,13 +478,41 @@ def display_run_info () {
             log.info "Maximum fiber length: $params.local_max_len"
             log.info "Compression: $params.local_compress_streamlines"
         }
-
         log.info ""
         log.info "PROCESSES PER TASKS"
+        if ( !params.infant_config ) {
+            log.info "Processes for denoising T1: $params.processes_denoise_t1"
+            log.info "Processes for BET T1: $params.processes_bet_t1"
+        }
         log.info "Processes for denoising DWI: $params.processes_denoise_dwi"
         log.info "Processes for EDDY: $params.processes_eddy"
         log.info "Processes for registration: $params.processes_registration"
         log.info "Processes for FODF: $params.processes_fodf"
+        log.info ""
+    }
+
+    if ( params.run_freesurfer ) {
+        log.info "[Freesurfer Options]"
+        log.info ""
+        log.info "Atlas utils folder: $params.atlas_utils_folder"
+        log.info "Compute FS, BN, GL, SF: $params.compute_FS_BN_GL_SF"
+        log.info "Compute lobes: $params.compute_lobes"
+        log.info "Compute lausanne multiscale: $params.compute_lausanne_multiscale"
+        log.info "Number of threads: $params.nb_threads"
+        log.info ""
+        log.info "ATLAS SELECTION"
+        log.info "Use Freesurfer atlas: $params.use_freesurfer_atlas"
+        log.info "Use Brainnetome atlas: $params.use_brainnetome_atlas"
+        log.info "Use Glasser atlas: $params.use_glasser_atlas"
+        log.info "Use Schaefer 100 atlas: $params.use_schaefer_100_atlas"
+        log.info "Use Schaefer 200 atlas: $params.use_schaefer_200_atlas"
+        log.info "Use Schaefer 400 atlas: $params.use_schaefer_400_atlas"
+        log.info "Use Lausanne 1 atlas: $params.use_lausanne_1_atlas"
+        log.info "Use Lausanne 2 atlas: $params.use_lausanne_2_atlas"
+        log.info "Use Lausanne 3 atlas: $params.use_lausanne_3_atlas"
+        log.info "Use Lausanne 4 atlas: $params.use_lausanne_4_atlas"
+        log.info "Use Lausanne 5 atlas: $params.use_lausanne_5_atlas"
+        log.info "Use dilated labels: $params.use_dilated_labels"
         log.info ""
     }
 
@@ -481,13 +523,20 @@ def display_run_info () {
         log.info "No pruning: $params.no_pruning"
         log.info "No remove loops: $params.no_remove_loops"
         log.info "No remove outliers: $params.no_remove_outliers"
-        log.info "Minimal outlier length: $params.min_length"
-        log.info "Maximal outlier lenght: $params.max_length"
+        log.info "Minimal length: $params.min_length"
+        log.info "Maximal length: $params.max_length"
         log.info "Maximum looping angle: $params.loop_max_angle"
+        log.info "Outlier treshold: $params.outlier_threshold"
         log.info ""
         log.info "COMMIT OPTIONS"
+        log.info "Run COMMIT: $params.run_commit"
+        log.info "Use COMMIT2: $params.use_commit2"
+        log.info "COMMIT on trk: $params.commit_on_trk"
+        log.info "B-value threshold: $params.b_thr"
         log.info "Number of directions: $params.nbr_dir"
+        log.info "Ball and stick: $params.ball_stick"
         log.info "Parallel diffusivity: $params.para_diff"
+        log.info "Perpendicular diffusivity: $params.perp_diff"
         log.info "Isotropic diffusivity: $params.iso_diff"
         log.info ""
         log.info "PROCESSES OPTIONS"

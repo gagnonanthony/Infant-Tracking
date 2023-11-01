@@ -2,7 +2,8 @@
 
 nextflow.enable.dsl=2
 
-include { TRANSFORM_LABELS } from "../processes/transform_labels.nf"
+include { TRANSFORM_LABELS;
+          TRANSFORM_T1 } from "../processes/transform.nf"
 include { DECOMPOSE_CONNECTIVITY } from "../processes/decompose.nf"
 include { COMMIT;
           COMMIT_ON_TRK } from "../processes/commit.nf"
@@ -17,15 +18,27 @@ workflow CONNECTOMICS {
         dwi_peaks_channel
         fodf_channel
         metrics_channel
-        t2w_channel
+        anat_channel
         transfos_channel
         
     main:
 
+        // ** If -profile freesurfer, transform t1 to diff space. ** //
+        if ( params.run_freesurfer && !params.run_tracking ) {
+            t1_for_transfo = anat_channel
+                                .combine(dwi_peaks_channel.map{ [it[0], it[1], it[2], it[3]] }, by: 0)
+                                .combine(transfos_channel, by: 0)   
+            TRANSFORM_T1(t1_for_transfo)
+            channel_for_transfo = labels_channel
+                                    .combine(TRANSFORM_T1.out.t1_warped, by: 0)
+                                    .combine(transfos_channel, by: 0)
+        } else {
+            channel_for_transfo = labels_channel
+                .combine(anat_channel, by: 0)
+                .combine(transfos_channel, by: 0)
+        }
+
         // ** Transforming labels to diff space ** //
-        channel_for_transfo = labels_channel
-            .combine(t2w_channel, by: 0)
-            .combine(transfos_channel, by: 0)
         TRANSFORM_LABELS(channel_for_transfo)
 
         // ** If -profile infant is used, first part will be run. COMMIT1 is the only supported ** //
