@@ -5,7 +5,11 @@ nextflow.enable.dsl=2
 process COMMIT {
     cpus params.processes_commit
     memory params.commit_memory_limit
-    label "COMMIT"
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(h5), path(dwi), path(bval), path(bvec), path(peaks)
@@ -43,9 +47,13 @@ process COMMIT {
 }
 
 process COMMIT_ON_TRK {
-    label "COMMIT"
     cpus params.processes_commit
     memory params.commit_memory_limit
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(trk_h5), path(dwi), path(bval), path(bvec), path(peaks)

@@ -4,6 +4,11 @@ nextflow.enable.dsl=2
 
 process FS_BN_GL_SF {
     cpus params.nb_threads
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Freesurfer/FS_BN_GL_SF/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Freesurfer/FS_BN_GL_SF/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(folder)
@@ -32,6 +37,11 @@ process FS_BN_GL_SF {
 
 process LOBES {
     cpus params.nb_threads
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Freesurfer/Lobes/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Freesurfer/Lobes/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(folder)
@@ -74,17 +84,18 @@ process LOBES {
 
 process LAUSANNE {
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Freesurfer/Lausanne/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Freesurfer/Lausanne/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(folder)
         each scale
 
     output:
-        tuple val(sid), path("lausanne_2008_scale_1*.nii.gz"), emit: lausanne_1
-        tuple val(sid), path("lausanne_2008_scale_2*.nii.gz"), emit: lausanne_2
-        tuple val(sid), path("lausanne_2008_scale_3*.nii.gz"), emit: lausanne_3
-        tuple val(sid), path("lausanne_2008_scale_4*.nii.gz"), emit: lausanne_4
-        tuple val(sid), path("lausanne_2008_scale_5*.nii.gz"), emit: lausanne_5
+        tuple val(sid), path("lausanne_2008_scale_${scale}*.nii.gz"), emit: lausanne_${scale}
         path("*.txt")
         path("*.json")
     
@@ -111,5 +122,3 @@ process LAUSANNE {
     cp $params.atlas_utils_folder/lausanne_multi_scale_atlas/*.json ./
     """
 }
-
-

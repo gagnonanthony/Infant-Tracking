@@ -16,10 +16,13 @@ From: scilus/scilus-flows:1.5.0
     apt-get update
     apt-get install -y csh tcsh
 
+    # Install libGLU
+    apt-get install -y libglu1-mesa
+
     # Download additional files
     wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
-    wget -O $APPTAINER_ROOTFS/FS_BN_GL_SF_utils.tar.gz https://www.dropbox.com/scl/fi/6s1tc4eanf2sutejw7fkd/FS_BN_GL_SF_utils.tar.gz?rlkey=3gvhvpepv7ldkqef3go10cb5e&dl=0 && \
-    tar -xzvf $APPTAINER_ROOTFS/FS_BN_GL_SF_utils.tar.gz && \
+    wget -O FS_BN_GL_SF_utils.tar.gz "https://www.dropbox.com/scl/fi/6s1tc4eanf2sutejw7fkd/FS_BN_GL_SF_utils.tar.gz?rlkey=3gvhvpepv7ldkqef3go10cb5e&dl=0" && \
+    tar -xzvf FS_BN_GL_SF_utils.tar.gz -C $APPTAINER_ROOTFS/ && \
     rm FS_BN_GL_SF_utils.tar.gz
 
     # Setup parallel

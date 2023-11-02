@@ -10,8 +10,16 @@ process have been taken:
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
-*** Please note that some steps have been removed from the original pipelines if they were not relevant ***
-*** for pediatric data. If you need some of these steps, please use the original pipelines. ***
+*** Please note that some steps have been removed from the original pipelines if they were not relevant for pediatric data. If you need some of these steps, please use the original pipelines. ***
+
+NEXTFLOW
+--------
+To install nextflow, please see : https://www.nextflow.io/docs/latest/getstarted.html#requirements 
+
+The pipeline export by default a `` parameters.json `` within the output directory to provide a documentation of the parameters used during the execution. For a more detailed report (excluding execution's parameters), 
+the default feature of nextflow `` -with-report <report_name.html> `` can be used to export a html report. Simply had this your command line when launching the pipeline: 
+
+`` nextflow run main.nf --input <input> <other_arguments> -with-report <report_name.html> ``
 
 APPTAINER
 ---------

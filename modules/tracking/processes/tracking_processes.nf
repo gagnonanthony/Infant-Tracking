@@ -3,8 +3,12 @@
 nextflow.enable.dsl=2
 
 process SEGMENT_TISSUES {
-    label "SEGMENTATION"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Segmentation/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Segmentation/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(anat)
@@ -31,8 +35,12 @@ process SEGMENT_TISSUES {
 }
 
 process GENERATE_MASKS {
-    label "GENERATE_MASKS"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(wm_mask), path(fa)
@@ -56,8 +64,12 @@ process GENERATE_MASKS {
 }
 
 process LOCAL_TRACKING_MASK {
-    label "LOCAL_TRACKING"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(wm), path(fa)
@@ -82,8 +94,12 @@ process LOCAL_TRACKING_MASK {
 }
 
 process LOCAL_SEEDING_MASK {
-    label "LOCAL_TRACKING"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(wm), path(fa)
@@ -108,8 +124,12 @@ process LOCAL_SEEDING_MASK {
 }
 
 process LOCAL_TRACKING {
-    label "LOCAL_TRACKING"
     cpus 2
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(fodf), path(seeding_mask), path(tracking_mask)
@@ -135,8 +155,12 @@ process LOCAL_TRACKING {
 }
 
 process PFT_SEEDING_MASK {
-    label "PFT_TRACKING"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(wm), path(fa), path(interface_mask)
@@ -169,8 +193,12 @@ process PFT_SEEDING_MASK {
 }
 
 process PFT_TRACKING_MASK {
-    label "PFT_TRACKING"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(wm), path(gm), path(csf)
@@ -193,8 +221,12 @@ process PFT_TRACKING_MASK {
 }
 
 process PFT_TRACKING {
-    label "PFT_TRACKING"
     cpus 2
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(fodf), path(include), path(exclude), path(seed)

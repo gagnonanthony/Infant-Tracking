@@ -3,8 +3,12 @@
 nextflow.enable.dsl=2
 
 process FODF_SHELL {
-    label "FODF"
     cpus 3
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/FODF/FODF_Shells/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/FODF/FODF_Shells/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -13,36 +17,40 @@ process FODF_SHELL {
         path("${sid}__bvec_fodf"), emit: dwi_fodf
     script:
     if (params.fodf_shells)
-      """
+    """
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
         scil_extract_dwi_shell.py $dwi \
-          $bval $bvec $params.fodf_shells ${sid}__dwi_fodf.nii.gz \
-          ${sid}__bval_fodf ${sid}__bvec_fodf -t $params.dwi_shell_tolerance -f
-      """
+            $bval $bvec $params.fodf_shells ${sid}__dwi_fodf.nii.gz \
+            ${sid}__bval_fodf ${sid}__bvec_fodf -t $params.dwi_shell_tolerance -f
+    """
     else
-      """
-      export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
-      export OMP_NUM_THREADS=1
-      export OPENBLAS_NUM_THREADS=1
+    """
+        export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+        export OMP_NUM_THREADS=1
+        export OPENBLAS_NUM_THREADS=1
 
-      shells=\$(awk -v min_fodf="$params.min_fodf_shell_value" -v b0_thr="$params.b0_thr" '{for (i = 1; i <= NF; i++) 
-              {v = int(\$i);if (v >= min_fodf || v <= b0_thr) shells[v] = 1;}}
-              END {
-                  for (v in shells) print v;
-                  }
-              ' "$bval" | sort -n | tr '\n' ' ')  
+        shells=\$(awk -v min_fodf="$params.min_fodf_shell_value" -v b0_thr="$params.b0_thr" '{for (i = 1; i <= NF; i++) 
+                {v = int(\$i);if (v >= min_fodf || v <= b0_thr) shells[v] = 1;}}
+                END {
+                    for (v in shells) print v;
+                    }
+                ' "$bval" | sort -n | tr '\n' ' ')  
 
-      scil_extract_dwi_shell.py $dwi \
+        scil_extract_dwi_shell.py $dwi \
         $bval $bvec \$shells ${sid}__dwi_fodf.nii.gz \
         ${sid}__bval_fodf ${sid}__bvec_fodf -t $params.dwi_shell_tolerance -f
-      """
+    """
 }
 
 process COMPUTE_FRF {
-    label "FRF"
     cpus 3
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/FRF/Compute_FRF/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/FRF/Compute_FRF/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -71,9 +79,12 @@ process COMPUTE_FRF {
 }
 
 process MEAN_FRF {
-    label "FRF"
     cpus 1
-    publishDir = params.Mean_FRF_Publish_Dir
+    if ( ! params.symlink ) {
+        publishDir "${params.Mean_FRF_Publish_Dir}/", mode: 'copy'
+    } else {
+        publishDir "${params.Mean_FRF_Publish_Dir}/", mode: 'symlink'
+    }
 
     input:
         path(all_frf)
@@ -89,8 +100,12 @@ process MEAN_FRF {
 }
 
 process FODF_METRICS {
-    label "FODF"
     cpus params.processes_fodf
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/FODF/FODF_Metrics/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/FODF/FODF_Metrics/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa), path(md), path(frf)

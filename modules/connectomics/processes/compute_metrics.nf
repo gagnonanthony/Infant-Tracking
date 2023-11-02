@@ -5,7 +5,11 @@ nextflow.enable.dsl=2
 process COMPUTE_AFD_FIXEL {
     cpus params.processes_afd_fixel
     memory '2 GB'
-    label "COMPUTE_AFD_FIXEL"
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/AFD_Fixel/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/AFD_Fixel/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(h5), path(fodf)
@@ -21,7 +25,11 @@ process COMPUTE_AFD_FIXEL {
 process COMPUTE_CONNECTIVITY {
     cpus params.processes_connectivity
     memory '2 GB'
-    label "COMPUTE_CONNECTIVITY"
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Connectivity_Metrics/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Connectivity_Metrics/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(h5), path(labels), path(metrics)

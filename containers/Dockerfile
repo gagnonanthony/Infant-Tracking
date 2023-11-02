@@ -14,7 +14,8 @@ RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer
     rm fs.tar.gz
 RUN wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
 RUN apt-get update && \
-    apt-get install csh tcsh
+    apt-get install csh tcsh && \
+    apt-get install libglu1-mesa
 RUN wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2 \
     tar xjf parallel-latest.tar.bz2 \
     cd parallel-* && ./configure && make && make install \

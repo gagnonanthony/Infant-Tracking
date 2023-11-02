@@ -5,7 +5,11 @@ nextflow.enable.dsl=2
 process TRANSFORM_LABELS {
     cpus 1
     memory '2 GB'
-    label "TRANSFORM_LABELS"
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Transform_Labels/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Transform_Labels/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(labels), path(t2), path(mat), path(syn)
@@ -23,6 +27,11 @@ process TRANSFORM_LABELS {
 process TRANSFORM_T1 {
     cpus 1
     memory '2 GB'
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Transform_T1/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Transform_T1/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t1), path(dwi), path(bval), path(bvec), path(mat), path(syn)

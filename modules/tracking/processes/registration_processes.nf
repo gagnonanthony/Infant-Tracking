@@ -3,8 +3,12 @@
 nextflow.enable.dsl=2
 
 process REGISTER_T2 {
-    label "REGISTER_T2"
     cpus params.processes_registration
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(md), path(t2w), path(wm_mask)
@@ -56,8 +60,12 @@ process REGISTER_T2 {
 }
 
 process REGISTER_T1 {
-    label "REGISTER_ANAT"
     cpus params.processes_registration
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(fa), path(t1), path(t1_mask), path(b0)

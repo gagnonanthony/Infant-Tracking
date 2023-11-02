@@ -5,7 +5,11 @@ nextflow.enable.dsl=2
 process DECOMPOSE_CONNECTIVITY {
     cpus 1
     memory { 7.B * trk.size() }
-    label "DECOMPOSE_CONNECTIVITY"
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/Connectomics/Decompose/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/Connectomics/Decompose/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(trk), path(labels)

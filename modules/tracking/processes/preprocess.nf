@@ -3,8 +3,12 @@
 nextflow.enable.dsl=2
 
 process BET_DWI {
-    label "BET"
     cpus 2
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Bet/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Bet/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -39,8 +43,12 @@ process BET_DWI {
 }
 
 process BET_T2 {
-    label "BET"
     cpus 2
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Bet/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Bet/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(anat)
@@ -58,8 +66,12 @@ process BET_T2 {
 }
 
 process DENOISING {
-    label "DENOISING"
     cpus params.processes_denoise_dwi
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Denoising/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Denoising/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi)
@@ -79,8 +91,12 @@ process DENOISING {
 }
 
 process TOPUP {
-    label "TOPUP"
     cpus 4
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Topup/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Topup/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(revb0)
@@ -113,9 +129,13 @@ process TOPUP {
 }
 
 process EDDY_TOPUP {
-    label "EDDY_TOPUP"
     cpus params.processes_eddy
     memory { 5.GB * task.attempt }
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Eddy_Topup/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Eddy_Topup/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0s_corrected), path(field), path(movpar)
@@ -152,8 +172,12 @@ process EDDY_TOPUP {
 }
 
 process N4 {
-    label "N4"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/N4/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/N4/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -179,8 +203,12 @@ process N4 {
 }
 
 process CROP_DWI {
-    label "CROP_VOLUMES"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Crop/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Crop/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(b0_mask)
@@ -203,8 +231,12 @@ process CROP_DWI {
 }
 
 process DENOISE_T1 {
-    label "DENOISE_T1"
     cpus params.processes_denoise_t1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Denoising/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Denoising/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t1)
@@ -224,8 +256,12 @@ process DENOISE_T1 {
 }
 
 process N4_T1 {
-    label "N4_T1"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/N4/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/N4/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t1)
@@ -246,8 +282,12 @@ process N4_T1 {
 }
 
 process CROP_ANAT {
-    label "CROP_VOLUMES"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Crop/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Crop/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t2w), path(mask)
@@ -268,8 +308,12 @@ process CROP_ANAT {
 }
 
 process RESAMPLE_T1 {
-    label "RESAMPLE_T1"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Resample/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Resample/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t1)
@@ -290,8 +334,12 @@ process RESAMPLE_T1 {
 }
 
 process BET_T1 {
-    label "BET_T1"
     cpus params.processes_bet_t1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Bet/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Bet/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t1)
@@ -317,8 +365,12 @@ process BET_T1 {
 }
 
 process RESAMPLE_ANAT {
-    label "RESAMPLE_VOLUMES"
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/ANAT/Resample/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/ANAT/Resample/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(t2w), path(mask)
@@ -343,8 +395,12 @@ process RESAMPLE_ANAT {
 }
 
 process NORMALIZE {
-    label "NORMALIZE_DWI"
     cpus 3
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Normalize/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Normalize/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -387,8 +443,12 @@ process NORMALIZE {
 }
 
 process RESAMPLE_DWI {
-    label "RESAMPLE_DWI"
     cpus 3
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Resample/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Resample/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(mask)
@@ -412,8 +472,12 @@ process RESAMPLE_DWI {
 }
 
 process EXTRACT_B0 {
-    label "EXTRACT_B0"
     cpus 3
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/B0/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/B0/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -433,6 +497,11 @@ process EXTRACT_B0 {
 
 process DWI_MASK {
     cpus 1
+    if ( ! params.symlink ) {
+        publishDir "${params.output_dir}/DWI/Mask/", mode: 'copy'
+    } else {
+        publishDir "${params.output_dir}/DWI/Mask/", mode: 'symlink'
+    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
