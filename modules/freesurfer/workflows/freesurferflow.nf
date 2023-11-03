@@ -31,6 +31,18 @@ workflow FREESURFERFLOW {
         LAUSANNE(FREESURFER.out.folders,
                 scales)
 
+        // ** Reorganizing Lausanne multiscale atlas channel ** //
+        lausanne1 = LAUSANNE.out.lausanne_1.map{ [it[0]] }
+                        .merge(LAUSANNE.out.lausanne_1.map{ [it[1]] }.flatMap())
+        lausanne2 = LAUSANNE.out.lausanne_2.map{ [it[0]] }
+                        .merge(LAUSANNE.out.lausanne_2.map{ [it[1]] }.flatMap())
+        lausanne3 = LAUSANNE.out.lausanne_3.map{ [it[0]] }
+                        .merge(LAUSANNE.out.lausanne_3.map{ [it[1]] }.flatMap())
+        lausanne4 = LAUSANNE.out.lausanne_4.map{ [it[0]] }
+                        .merge(LAUSANNE.out.lausanne_4.map{ [it[1]] }.flatMap())
+        lausanne5 = LAUSANNE.out.lausanne_5.map{ [it[0]] }
+                        .merge(LAUSANNE.out.lausanne_5.map{ [it[1]] }.flatMap())
+
         // ** Work out a way for the user to select which atlas to use. ** //
         // ** Could be cleaner than a bunch of if statements in the future. ** //
         if ( params.use_freesurfer_atlas ) {
@@ -83,43 +95,33 @@ workflow FREESURFERFLOW {
             }
         } else if ( params.use_lausanne_1_atlas ) {
             if ( params.use_dilated_labels ) {
-                labels = LAUSANNE.out.lausanne_1
-                                    .map{ [it[0], it[2]] }
+                labels = lausanne1.map{ [it[0], it[2]] }          
             } else {
-                labels = LAUSANNE.out.lausanne_1
-                                    .map{ [it[0], it[1]] }
+                labels = lausanne1.map{ [it[0], it[1]] }
             }
         } else if ( params.use_lausanne_2_atlas ) {
             if ( params.use_dilated_labels ) {
-                labels = LAUSANNE.out.lausanne_2
-                                    .map{ [it[0], it[2]] }
+                labels = lausanne2.map{ [it[0], it[2]] }
             } else {
-                labels = LAUSANNE.out.lausanne_2
-                                    .map{ [it[0], it[1]] }
+                labels = lausanne2.map{ [it[0], it[1]] }
             }
         } else if ( params.use_lausanne_3_atlas ) {
             if ( params.use_dilated_labels ) {
-                labels = LAUSANNE.out.lausanne_3
-                                    .map{ [it[0], it[2]] }
+                labels = lausanne3.map{ [it[0], it[2]] }
             } else {
-                labels = LAUSANNE.out.lausanne_3
-                                    .map{ [it[0], it[1]] }
+                labels = lausanne3.map{ [it[0], it[1]] }
             }
         } else if ( params.use_lausanne_4_atlas ) {
             if ( params.use_dilated_labels ) {
-                labels = LAUSANNE.out.lausanne_4
-                                    .map{ [it[0], it[2]] }
+                labels = lausanne4.map{ [it[0], it[2]] }                
             } else {
-                labels = LAUSANNE.out.lausanne_4
-                                    .map{ [it[0], it[1]] }
+                labels = lausanne4.map{ [it[0], it[1]] }
             }
         } else if ( params.use_lausanne_5_atlas ) {
             if ( params.use_dilated_labels ) {
-                labels = LAUSANNE.out.lausanne_5
-                                    .map{ [it[0], it[2]] }
+                labels = lausanne5.map{ [it[0], it[2]] }
             } else {
-                labels = LAUSANNE.out.lausanne_5
-                                    .map{ [it[0], it[1]] }
+                labels = lausanne5.map{ [it[0], it[1]] }
             }
         }
 

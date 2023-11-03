@@ -95,7 +95,11 @@ process LAUSANNE {
         each scale
 
     output:
-        tuple val(sid), path("lausanne_2008_scale_${scale}*.nii.gz"), emit: lausanne_${scale}
+        tuple val(sid), path("lausanne_2008_scale_1*.nii.gz"), emit: lausanne_1, optional: true
+        tuple val(sid), path("lausanne_2008_scale_2*.nii.gz"), emit: lausanne_2, optional: true
+        tuple val(sid), path("lausanne_2008_scale_3*.nii.gz"), emit: lausanne_3, optional: true
+        tuple val(sid), path("lausanne_2008_scale_4*.nii.gz"), emit: lausanne_4, optional: true
+        tuple val(sid), path("lausanne_2008_scale_5*.nii.gz"), emit: lausanne_5, optional: true
         path("*.txt")
         path("*.json")
     
