@@ -9,12 +9,18 @@ process FS_BN_GL_SF {
         tuple val(sid), path(folder)
 
     output:
-        tuple val(sid), path("*freesurfer*.nii.gz"), emit: freesurfer
-        tuple val(sid), path("*brainnetome*.nii.gz"), emit: brainnetome
-        tuple val(sid), path("*glasser*.nii.gz"), emit: glasser
-        tuple val(sid), path("*schaefer_100*.nii.gz"), emit: schaefer_100
-        tuple val(sid), path("*schaefer_200*.nii.gz"), emit: schaefer_200
-        tuple val(sid), path("*schaefer_400*.nii.gz"), emit: schaefer_400
+        tuple val(sid), path("*freesurfer_v5.nii.gz"), emit: freesurfer
+        tuple val(sid), path("*freesurfer_v5_dilate.nii.gz"), emit: freesurfer_dilated
+        tuple val(sid), path("*brainnetome_v5.nii.gz"), emit: brainnetome
+        tuple val(sid), path("*brainnetome_v5_dilate.nii.gz"), emit: brainnetome_dilated
+        tuple val(sid), path("*glasser_v5.nii.gz"), emit: glasser
+        tuple val(sid), path("*glasser_v5_dilate.nii.gz"), emit: glasser_dilated
+        tuple val(sid), path("*schaefer_100_v5.nii.gz"), emit: schaefer_100
+        tuple val(sid), path("*schaefer_100_v5_dilate.nii.gz"), emit: schaefer_100_dilated
+        tuple val(sid), path("*schaefer_200_v5.nii.gz"), emit: schaefer_200
+        tuple val(sid), path("*schaefer_200_v5_dilate.nii.gz"), emit: schaefer_200_dilated
+        tuple val(sid), path("*schaefer_400_v5.nii.gz"), emit: schaefer_400
+        tuple val(sid), path("*schaefer_400_v5_dilate.nii.gz"), emit: schaefer_400_dilated
         path("*[brainnetome,freesurfer,glasser,schaefer]*.txt")
         path("*[brainnetome,freesurfer,glasser,schaefer]*.json")
 
