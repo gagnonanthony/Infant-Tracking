@@ -6,9 +6,9 @@ process DECOMPOSE_CONNECTIVITY {
     cpus 1
     memory { 7.B * trk.size() }
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Decompose/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Decompose/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Decompose/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Decompose/", mode: 'symlink'
     }
 
     input:

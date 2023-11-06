@@ -5,9 +5,9 @@ nextflow.enable.dsl=2
 process FS_BN_GL_SF {
     cpus params.nb_threads
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Freesurfer/FS_BN_GL_SF/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/FS_BN_GL_SF/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Freesurfer/FS_BN_GL_SF/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/FS_BN_GL_SF/", mode: 'symlink'
     }
 
     input:
@@ -38,9 +38,9 @@ process FS_BN_GL_SF {
 process LOBES {
     cpus params.nb_threads
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Freesurfer/Lobes/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/Lobes/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Freesurfer/Lobes/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/Lobes/", mode: 'symlink'
     }
 
     input:
@@ -85,9 +85,9 @@ process LOBES {
 process LAUSANNE {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Freesurfer/Lausanne/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/Lausanne/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Freesurfer/Lausanne/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Freesurfer/Lausanne/", mode: 'symlink'
     }
 
     input:

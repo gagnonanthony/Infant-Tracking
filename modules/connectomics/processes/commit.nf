@@ -6,9 +6,9 @@ process COMMIT {
     cpus params.processes_commit
     memory params.commit_memory_limit
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Commit/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Commit/", mode: 'symlink'
     }
 
     input:
@@ -50,9 +50,9 @@ process COMMIT_ON_TRK {
     cpus params.processes_commit
     memory params.commit_memory_limit
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Commit/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Commit/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Commit/", mode: 'symlink'
     }
 
     input:

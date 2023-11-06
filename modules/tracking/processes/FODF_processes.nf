@@ -5,9 +5,9 @@ nextflow.enable.dsl=2
 process FODF_SHELL {
     cpus 3
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/FODF/FODF_Shells/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/FODF/FODF_Shells/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/FODF/FODF_Shells/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/FODF/FODF_Shells/", mode: 'symlink'
     }
 
     input:
@@ -47,9 +47,9 @@ process FODF_SHELL {
 process COMPUTE_FRF {
     cpus 3
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/FRF/Compute_FRF/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/FRF/Compute_FRF/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/FRF/Compute_FRF/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/FRF/Compute_FRF/", mode: 'symlink'
     }
 
     input:
@@ -102,9 +102,9 @@ process MEAN_FRF {
 process FODF_METRICS {
     cpus params.processes_fodf
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/FODF/FODF_Metrics/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/FODF/FODF_Metrics/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/FODF/FODF_Metrics/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/FODF/FODF_Metrics/", mode: 'symlink'
     }
 
     input:

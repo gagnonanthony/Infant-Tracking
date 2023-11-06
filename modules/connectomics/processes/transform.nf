@@ -6,9 +6,9 @@ process TRANSFORM_LABELS {
     cpus 1
     memory '2 GB'
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Transform_Labels/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Transform_Labels/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Transform_Labels/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Transform_Labels/", mode: 'symlink'
     }
 
     input:
@@ -28,9 +28,9 @@ process TRANSFORM_T1 {
     cpus 1
     memory '2 GB'
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Transform_T1/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Transform_T1/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Transform_T1/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Transform_T1/", mode: 'symlink'
     }
 
     input:

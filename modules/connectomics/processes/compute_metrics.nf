@@ -6,9 +6,9 @@ process COMPUTE_AFD_FIXEL {
     cpus params.processes_afd_fixel
     memory '2 GB'
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/AFD_Fixel/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/AFD_Fixel/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/AFD_Fixel/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/AFD_Fixel/", mode: 'symlink'
     }
 
     input:
@@ -26,9 +26,9 @@ process COMPUTE_CONNECTIVITY {
     cpus params.processes_connectivity
     memory '2 GB'
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Connectivity_Metrics/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Connectivity_Metrics/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Connectivity_Metrics/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Connectivity_Metrics/", mode: 'symlink'
     }
 
     input:

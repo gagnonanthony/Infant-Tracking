@@ -5,9 +5,9 @@ nextflow.enable.dsl=2
 process REGISTER_T2 {
     cpus params.processes_registration
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Registration/Register_Anat/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Registration/Register_Anat/", mode: 'symlink'
     }
 
     input:
@@ -62,9 +62,9 @@ process REGISTER_T2 {
 process REGISTER_T1 {
     cpus params.processes_registration
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Registration/Register_Anat/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Registration/Register_Anat/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Registration/Register_Anat/", mode: 'symlink'
     }
 
     input:

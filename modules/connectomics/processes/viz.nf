@@ -6,9 +6,9 @@ process VISUALIZE_CONNECTIVITY {
     cpus 1
     memory "2 GB"
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Connectomics/Visualize_Connectivity/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Visualize_Connectivity/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Connectomics/Visualize_Connectivity/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Connectomics/Visualize_Connectivity/", mode: 'symlink'
     }
 
     input:

@@ -5,9 +5,9 @@ nextflow.enable.dsl=2
 process SEGMENT_TISSUES {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Segmentation/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Segmentation/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Segmentation/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Segmentation/", mode: 'symlink'
     }
 
     input:
@@ -37,9 +37,9 @@ process SEGMENT_TISSUES {
 process GENERATE_MASKS {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'symlink'
     }
 
     input:
@@ -66,9 +66,9 @@ process GENERATE_MASKS {
 process LOCAL_TRACKING_MASK {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'symlink'
     }
 
     input:
@@ -96,9 +96,9 @@ process LOCAL_TRACKING_MASK {
 process LOCAL_SEEDING_MASK {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'symlink'
     }
 
     input:
@@ -126,9 +126,9 @@ process LOCAL_SEEDING_MASK {
 process LOCAL_TRACKING {
     cpus 2
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Tracking/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Tracking/", mode: 'symlink'
     }
 
     input:
@@ -157,9 +157,9 @@ process LOCAL_TRACKING {
 process PFT_SEEDING_MASK {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'symlink'
     }
 
     input:
@@ -195,9 +195,9 @@ process PFT_SEEDING_MASK {
 process PFT_TRACKING_MASK {
     cpus 1
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Masks/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Masks/", mode: 'symlink'
     }
 
     input:
@@ -223,9 +223,9 @@ process PFT_TRACKING_MASK {
 process PFT_TRACKING {
     cpus 2
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/Tracking/Tracking/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/Tracking/Tracking/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/Tracking/Tracking/", mode: 'symlink'
     }
 
     input:

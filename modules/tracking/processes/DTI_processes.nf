@@ -5,9 +5,9 @@ nextflow.enable.dsl=2
 process EXTRACT_DTI_SHELL {
     cpus 3
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/DTI/DTI_Shells/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/DTI/DTI_Shells/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/DTI/DTI_Shells/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/DTI/DTI_Shells/", mode: 'symlink'
     }
 
     input:
@@ -43,9 +43,9 @@ process EXTRACT_DTI_SHELL {
 process DTI_METRICS {
     cpus 3
     if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/DTI/DTI_Metrics/", mode: 'copy'
+        publishDir "${params.output_dir}/${sid}/DTI/DTI_Metrics/", mode: 'copy'
     } else {
-        publishDir "${params.output_dir}/DTI/DTI_Metrics/", mode: 'symlink'
+        publishDir "${params.output_dir}/${sid}/DTI/DTI_Metrics/", mode: 'symlink'
     }
 
     input:
