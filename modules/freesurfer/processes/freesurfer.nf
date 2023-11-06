@@ -4,11 +4,6 @@ nextflow.enable.dsl=2
 
 process FREESURFER {
     cpus params.nb_threads
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/Freesurfer/Freesurfer/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/Freesurfer/Freesurfer/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(anat)

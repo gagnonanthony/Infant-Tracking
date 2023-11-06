@@ -4,11 +4,6 @@ nextflow.enable.dsl=2
 
 process FODF_SHELL {
     cpus 3
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/FODF/FODF_Shells/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/FODF/FODF_Shells/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -46,11 +41,6 @@ process FODF_SHELL {
 
 process COMPUTE_FRF {
     cpus 3
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/FRF/Compute_FRF/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/FRF/Compute_FRF/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -80,11 +70,6 @@ process COMPUTE_FRF {
 
 process MEAN_FRF {
     cpus 1
-    if ( ! params.symlink ) {
-        publishDir "${params.Mean_FRF_Publish_Dir}/", mode: 'copy'
-    } else {
-        publishDir "${params.Mean_FRF_Publish_Dir}/", mode: 'symlink'
-    }
 
     input:
         path(all_frf)
@@ -101,11 +86,6 @@ process MEAN_FRF {
 
 process FODF_METRICS {
     cpus params.processes_fodf
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/FODF/FODF_Metrics/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/FODF/FODF_Metrics/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa), path(md), path(frf)

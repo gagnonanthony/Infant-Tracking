@@ -5,11 +5,6 @@ nextflow.enable.dsl=2
 process VISUALIZE_CONNECTIVITY {
     cpus 1
     memory "2 GB"
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/Connectomics/Visualize_Connectivity/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/Connectomics/Visualize_Connectivity/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(npy)

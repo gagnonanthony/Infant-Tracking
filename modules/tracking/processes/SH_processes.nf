@@ -4,11 +4,6 @@ nextflow.enable.dsl=2
 
 process SH_FITTING_SHELL {
     cpus 3
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/SH/SH_Shells/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/SH/SH_Shells/", mode: 'symlink'
-    }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -28,11 +23,6 @@ process SH_FITTING_SHELL {
 
 process SH_FITTING {
     cpus 1
-    if ( ! params.symlink ) {
-        publishDir "${params.output_dir}/${sid}/SH/SH_Fitting/", mode: 'copy'
-    } else {
-        publishDir "${params.output_dir}/${sid}/SH/SH_Fitting/", mode: 'symlink'
-    }
     
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
