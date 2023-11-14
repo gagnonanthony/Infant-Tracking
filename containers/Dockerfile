@@ -1,4 +1,4 @@
-FROM scilus/scilus-flows:1.5.0
+FROM scilus/scilus:1.6.0
 
 LABEL version="ChildBrainFlow-1.0.0"
 
@@ -15,7 +15,9 @@ RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer
 RUN wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
 RUN apt-get update && \
     apt-get install csh tcsh && \
-    apt-get install libglu1-mesa
+    apt-get install -y libglu1-mesa libxt6 libxmu6 libgl1 freeglut3-dev \
+    echo "/usr/local/lib" >> /etc/ld.so.conf \
+    ldconfig
 RUN wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2 \
     tar xjf parallel-latest.tar.bz2 \
     cd parallel-* && ./configure && make && make install \

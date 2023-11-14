@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: scilus/scilus-flows:1.5.0
+From: scilus/scilus:1.6.0
 
 %labels
     version ChildBrainFlow-1.0.0
@@ -16,8 +16,10 @@ From: scilus/scilus-flows:1.5.0
     apt-get update
     apt-get install -y csh tcsh
 
-    # Install libGLU
-    apt-get install -y libglu1-mesa
+    # Install lib*
+    apt-get install -y libglu1-mesa libxt6 libxmu6 libgl1 freeglut3-dev
+    echo "/usr/local/lib" >> /etc/ld.so.conf
+    ldconfig
 
     # Download additional files
     wget -O /usr/local/freesurfer/license.txt https://www.dropbox.com/scl/fi/0s8lp6lydyd0rxawxb4jm/license.txt?rlkey=hz54oc0d4sor69avqphtrjvgn&dl=0
