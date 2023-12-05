@@ -204,6 +204,16 @@ OPTIONAL ARGUMENTS (current value)
     --outlier_threshold                         Outlier removal threshold when using hierarchical QB 
                                                 ($outlier_threshold)
 
+    COMPUTE_PRIORS OPTIONS
+    --compute_priors                            If set, priors will individually computed for each subject before being
+                                                fed to COMMIT. ($compute_priors)
+    --fa_min_priors                             Minimal FA value to consider a voxel a single fiber population.
+                                                ($fa_min_priors)
+    --fa_max_priors                             Maximal FA value to consider a voxel as being in a ventricle.
+                                                ($fa_max_priors)
+    --md_min_priors                             Minimal MD value to consider a voxel as being in a ventricle.
+                                                ($md_min_priors) 
+
     COMMIT OPTIONS
     --run_commit                                If set, COMMIT will be run on the tractogram. ($run_commit)
     --use_commit2                               If set, COMMIT2 will be use rather than COMMIT1. ($use_commit2)

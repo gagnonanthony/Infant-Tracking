@@ -29,6 +29,30 @@ process SEGMENT_TISSUES {
     """    
 }
 
+process ATROPOS_SEG {
+    cpus 1
+
+    input:
+        tuple val(sid), path(anat), path(mask)
+    output:
+        tuple val(sid), path("${sid}__map_wm.nii.gz"), emit: wm_map
+        tuple val(sid), path("${sid}__map_gm.nii.gz"), emit: gm_map
+        tuple val(sid), path("${sid}__map_csf.nii.gz"), emit: csf_map
+    
+    script:
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    antsAtroposN4.sh -d 3 -a $anat -x $mask -c 3 \
+        -o ${sid}__ -m $params.atropos_m -n $params.atropos_n \
+        -b $params.atropos_formulation
+    mv ${sid}__SegmentationPosteriors3.nii.gz ${sid}__map_wm.nii.gz
+    mv ${sid}__SegmentationPosteriors2.nii.gz ${sid}__map_gm.nii.gz
+    mv ${sid}__SegmentationPosteriors1.nii.gz ${sid}__map_csf.nii.gz
+    """
+}
+
 process GENERATE_MASKS {
     cpus 1
 

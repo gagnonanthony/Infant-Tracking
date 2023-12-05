@@ -152,6 +152,10 @@ workflow {
             // ** Fetching transformation files ** //
             transfos = REGISTRATION.out.transfos
 
+            // ** Fetching FA, MD, AD for priors computation ** //
+            fa_md_ad_channel = DTI.out.fa_and_md
+                                .combine(DTI.out.ad_and_rd.map{[ it[0], it[1] ]}, by: 0)
+
             // ** Launching connectomics workflow ** //
             CONNECTOMICS(tracking,
                         labels,
@@ -159,7 +163,8 @@ workflow {
                         fodf,
                         metrics_flat,
                         t2w,
-                        transfos)
+                        transfos,
+                        fa_md_ad_channel)
         }
 
         if ( params.run_connectomics && !params.run_tracking ) {
@@ -185,7 +190,8 @@ workflow {
                         data.fodf,
                         metrics,
                         anat,
-                        data.transfos)
+                        data.transfos,
+                        [])
         }
     }
 }
@@ -318,8 +324,13 @@ def display_usage () {
                 "max_length":"$params.max_length",
                 "loop_max_angle":"$params.loop_max_angle",
                 "outlier_threshold":"$params.outlier_threshold",
+                "compute_priors":"$params.compute_priors",
+                "fa_min_priors":"$params.fa_min_priors",
+                "fa_max_priors":"$params.fa_max_priors",
+                "md_min_priors":"$params.md_min_priors",
                 "run_commit":"$params.run_commit",
                 "use_commit2":"$params.use_commit2",
+                "use_both":"$params.use_both",
                 "commit_on_trk":"$params.commit_on_trk",
                 "b_thr":"$params.b_thr",
                 "ball_stick":"$params.ball_stick",
