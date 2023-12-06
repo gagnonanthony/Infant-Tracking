@@ -104,7 +104,8 @@ process COMPUTE_PRIORS {
         --out_txt_1fiber_perp ${sid}__perp_diff.txt \
         --out_mask_1fiber ${sid}__mask_1fiber.nii.gz \
         --out_mask_ventricles ${sid}__mask_ventricles.nii.gz \
-        --fa_min $params.fa_min_priors --fa_max $params.fa_max_priors --md_min $params.md_min_priors
+        --fa_min $params.fa_min_priors --fa_max $params.fa_max_priors \
+        --md_min $params.md_min_priors --roi_radius $params.roi_radius_priors
     """
 }
 

@@ -337,6 +337,7 @@ def display_usage () {
                 "fa_min_priors":"$params.fa_min_priors",
                 "fa_max_priors":"$params.fa_max_priors",
                 "md_min_priors":"$params.md_min_priors",
+                "roi_radius_priors":"$params.roi_radius",
                 "run_commit":"$params.run_commit",
                 "use_commit2":"$params.use_commit2",
                 "use_both":"$params.use_both",
