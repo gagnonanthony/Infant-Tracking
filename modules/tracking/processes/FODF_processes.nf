@@ -70,6 +70,7 @@ process COMPUTE_FRF {
 
 process MEAN_FRF {
     cpus 1
+    publishDir = "${params.output_dir}/MEAN_FRF"
 
     input:
         path(all_frf)

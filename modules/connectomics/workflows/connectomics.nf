@@ -4,8 +4,8 @@ nextflow.enable.dsl=2
 
 include { TRANSFORM_LABELS;
           TRANSFORM_T1 } from "../processes/transform.nf"
-include { DECOMPOSE_CONNECTIVITY } from "../processes/decompose.nf"
-include { DECOMPOSE_CONNECTIVITY as DECOMPOSE_CONNECTIVITY_2 } from "../processes/decompose.nf"
+include { DECOMPOSE_CONNECTIVITY as INITIAL_DECOMPOSE } from "../processes/decompose.nf"
+include { DECOMPOSE_CONNECTIVITY as FINAL_DECOMPOSE } from "../processes/decompose.nf"
 include { COMMIT;
           COMMIT_ON_TRK;
           COMPUTE_PRIORS } from "../processes/commit.nf"
@@ -22,11 +22,11 @@ workflow CONNECTOMICS {
         metrics_channel
         anat_channel
         transfos_channel
-        fa_ad_md_channel
+        fa_md_ad_rd_channel
         
     main:
         // ** Computing priors for COMMIT ** //
-        COMPUTE_PRIORS(fa_ad_md_channel)
+        COMPUTE_PRIORS(fa_md_ad_rd_channel)
 
         // ** If -profile freesurfer, transform t1 to diff space. ** //
         if ( params.run_freesurfer && !params.run_tracking ) {
@@ -59,22 +59,22 @@ workflow CONNECTOMICS {
             // ** Decomposing tractogram ** //
             decompose_channel = COMMIT_ON_TRK.out.trk_commit
                                 .combine(TRANSFORM_LABELS.out.labels_warped, by: 0)
-            DECOMPOSE_CONNECTIVITY(decompose_channel)
+            INITIAL_DECOMPOSE(decompose_channel)
 
             // ** Setting output channel ** //
-            afd_fixel_channel = DECOMPOSE_CONNECTIVITY.out.decompose
+            afd_fixel_channel = INITIAL_DECOMPOSE.out.decompose
                                     .combine(fodf_channel, by: 0)
         }
         else {
             // ** Decomposing tractogram ** //
             decompose_channel = tracking_channel
                                     .combine(TRANSFORM_LABELS.out.labels_warped, by: 0)
-            DECOMPOSE_CONNECTIVITY(decompose_channel)
+            INITIAL_DECOMPOSE(decompose_channel)
 
             // ** Running COMMIT1 or COMMIT2 ** //
             if ( params.use_both ) {
 
-            commit_channel = DECOMPOSE_CONNECTIVITY.out.decompose
+            commit_channel = INITIAL_DECOMPOSE.out.decompose
                                 .combine(dwi_peaks_channel, by: 0)
                                 .combine(COMPUTE_PRIORS.out.para_diff, by: 0)
                                 .combine(COMPUTE_PRIORS.out.iso_diff, by: 0)
@@ -82,18 +82,18 @@ workflow CONNECTOMICS {
             COMMIT(commit_channel)
             decompose_channel = COMMIT.out.trk_commit
                                     .combine(TRANSFORM_LABELS.out.labels_warped, by: 0)
-            DECOMPOSE_CONNECTIVITY_2(decompose_channel)
+            FINAL_DECOMPOSE(decompose_channel)
 
             // ** Setting output channel ** //
-            afd_fixel_channel = DECOMPOSE_CONNECTIVITY_2.out.decompose
+            afd_fixel_channel = FINAL_DECOMPOSE.out.decompose
                                     .combine(fodf_channel, by: 0)
             }
             else {
-            commit_channel = DECOMPOSE_CONNECTIVITY.out.decompose
+            commit_channel = INITIAL_DECOMPOSE.out.decompose
                                 .combine(dwi_peaks_channel, by: 0)
                                 .combine([], by: 0)
                                 .combine([], by: 0)
-                                
+
             COMMIT(commit_channel)
             // ** Setting output channel ** //
             afd_fixel_channel = COMMIT.out.h5_commit

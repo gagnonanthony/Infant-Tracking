@@ -25,6 +25,7 @@ include {   TRACKING } from "./modules/tracking/workflows/tracking.nf"
 include {   CONNECTOMICS } from "./modules/connectomics/workflows/connectomics.nf"
 include {   POPULATION_TEMPLATE } from "./modules/template/workflows/pop_template.nf"
 include {   FREESURFERFLOW } from "./modules/freesurfer/workflows/freesurferflow.nf"
+include {   PRIORS } from "./modules/priors/workflows/priors.nf"
 
 workflow {
     if (params.help) { display_usage() }
@@ -50,6 +51,14 @@ workflow {
             data = get_data_freesurfer()
 
             FREESURFERFLOW(data.anat)
+        }
+
+        if ( params.priors ) {
+
+            data = get_data_tracking()
+
+            PRIORS(data.dwi)
+
         }
 
         if ( params.run_tracking ) {
@@ -152,9 +161,9 @@ workflow {
             // ** Fetching transformation files ** //
             transfos = REGISTRATION.out.transfos
 
-            // ** Fetching FA, MD, AD for priors computation ** //
-            fa_md_ad_channel = DTI.out.fa_and_md
-                                .combine(DTI.out.ad_and_rd.map{[ it[0], it[1] ]}, by: 0)
+            // ** Fetching FA, MD, AD, RD for priors computation ** //
+            fa_md_ad_rd_channel = DTI.out.fa_and_md
+                                .combine(DTI.out.ad_and_rd, by: 0)
 
             // ** Launching connectomics workflow ** //
             CONNECTOMICS(tracking,
