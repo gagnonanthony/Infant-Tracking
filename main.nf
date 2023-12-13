@@ -173,7 +173,7 @@ workflow {
                         metrics_flat,
                         t2w,
                         transfos,
-                        fa_md_ad_channel)
+                        fa_md_ad_rd_channel)
         }
 
         if ( params.run_connectomics && !params.run_tracking ) {
