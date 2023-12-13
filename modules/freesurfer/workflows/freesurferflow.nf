@@ -3,10 +3,12 @@
 nextflow.enable.dsl=2
 
 include {
-    FREESURFER
+    FREESURFER;
+    RECON_SURF
 } from '../processes/freesurfer.nf'
 include {
     FS_BN_GL_SF;
+    BN_CHILD;
     LOBES;
     LAUSANNE
 } from '../processes/atlases.nf'
@@ -17,18 +19,30 @@ workflow FREESURFERFLOW {
 
     main:
 
+        if ( params.recon_all ) {
         // ** Lauching FreeSurfer Recon-all ** //
         FREESURFER(anat)
+        folder_channel = FREESURFER.out.folders
+        t1 = FREESURFER.out.final_t1
+        } else if ( params.recon_surf ) {
+        // ** Launching FastSurfer ** //
+        RECON_SURF(anat)
+        folder_channel = RECON_SURF.out.folders
+        t1 = RECON_SURF.out.final_t1
+        }
 
         // ** Computing FS_BN_GL_SF atlases ** //
-        FS_BN_GL_SF(FREESURFER.out.folders)
+        FS_BN_GL_SF(folder_channel)
+
+        // ** Computing BN_CHILD Atlas ** //
+        BN_CHILD(folder_channel)
 
         // ** Computing lobes atlases ** //
-        LOBES(FREESURFER.out.folders)
+        LOBES(folder_channel)
 
         // ** Computing lausanne atlas ** //
         scales = Channel.from(1,2,3,4,5)
-        LAUSANNE(FREESURFER.out.folders,
+        LAUSANNE(folder_channel,
                 scales)
 
         // ** Reorganizing Lausanne multiscale atlas channel ** //
@@ -56,6 +70,12 @@ workflow FREESURFERFLOW {
                 labels = FS_BN_GL_SF.out.brainnetome_dilated
             } else {
                 labels = FS_BN_GL_SF.out.brainnetome
+            }
+        } else if ( params.use_brainnetome_child_atlas ) {
+            if ( params.use_dilated_labels ) {
+                labels = BN_CHILD.out.brainnetome_child_dilated
+            } else {
+                labels = BN_CHILD.out.brainnetome_child
             }
         } else if ( params.use_glasser_atlas ) {
             if ( params.use_dilated_labels ) {
@@ -115,5 +135,5 @@ workflow FREESURFERFLOW {
 
     emit:
         labels
-        t1 = FREESURFER.out.final_t1
+        t1
 }

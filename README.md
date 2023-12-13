@@ -10,38 +10,46 @@ process have been taken:
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
     3. Connectoflow (https://github.com/scilus/connectoflow)
 
-*** Please note that some steps have been removed from the original pipelines if they were not relevant for pediatric data. If you need some of these steps, please use the original pipelines. ***
+> [!NOTE]
+> Please note that some steps have been removed from the original pipelines if they were not relevant for pediatric data. If you need some of these steps, please use the original pipelines.
 
-NEXTFLOW
+Nextflow
 --------
 To install nextflow, please see : https://www.nextflow.io/docs/latest/getstarted.html#requirements 
 
-The pipeline export by default a `` parameters.json `` within the output directory to provide a documentation of the parameters used during the execution. For a more detailed report (excluding execution's parameters), 
-the default feature of nextflow `` -with-report <report_name.html> `` can be used to export a html report. Simply had this your command line when launching the pipeline: 
+The pipeline export by default a `` parameters.json `` within the output directory to provide a documentation of the parameters used during the execution. For a more detailed report (excluding execution's parameters), the default feature of nextflow `` -with-report <report_name.html> `` can be used to export a html report. Simply had this your command line when launching the pipeline: 
 
-`` nextflow run main.nf --input <input> <other_arguments> -with-report <report_name.html> ``
+```
+nextflow run main.nf --input <input> <other_arguments> -with-report <report_name.html>
+```
 
-APPTAINER
+Apptainer
 ---------
 If you are running this pipeline on Linux, it is recommended to run the pipeline using an apptainer image. 
 The pipeline comes with a recipe file (`` /containers/apptainer_recipe.def ``) containing all the required 
 dependencies to successfully run every profiles. To build the apptainer image, run this command: 
 
-`` sudo apptainer build <image_name> </path/to/apptainer_recipe.def ``
+```
+sudo apptainer build <image_name> </path/to/apptainer_recipe.def
+```
 
-DOCKER
+Docker
 ------
 If you are on MacOS or Windows, you can use Docker to run ChildBrainFlow. The pipeline comes with
 a Dockerfile containing all the dependencies required to successfully run every profiles of the pipeline. 
 Simply run this command from inside the  `` /containers/ `` folder:
 
-`` docker build -t <container_name> . ``
+```
+docker build -t <container_name> .
+```
+> [!WARNING]
+> Due to the high number of dependencies (ANTs, FSL, MRtrix3, Scilpy, Freesurfer, FastSurfer, etc.), the resulting docker image can be pretty large (~ 40Gb).
 
-USAGE
+Usage
 -----
 See _USAGE_ or run `` nextflow run main.nf --help `` for more details.
 
-REFERENCES
+References
 ----------
 If you used this pipeline, please cite :
 

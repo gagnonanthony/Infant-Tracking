@@ -36,6 +36,30 @@ process FS_BN_GL_SF {
     """
 }
 
+process BN_CHILD {
+    cpus params.nb_threads
+
+    input:
+        tuple val(sid), path(folder)
+
+    output:
+        tuple val(sid), path("*brainnetome_child_v1.nii.gz"), emit: brainnetome_child
+        tuple val(sid), path("*brainnetome_child_v1_dilate.nii.gz"), emit: brainnetome_child_dilated
+        path("*[brainnetome_child]*.txt")
+        path("*[brainnetome_child]*.json")
+
+    when:
+        params.compute_BN_child
+
+    script:
+    """
+    ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
+    bash $params.atlas_utils_folder/freesurfer_utils/generate_atlas_BN_child.sh \$(dirname ${folder}) \
+        ${sid} ${params.nb_threads} Child_Atlas/
+    cp $sid/Child_Atlas/* ./
+    """
+}
+
 process LOBES {
     cpus params.nb_threads
 
@@ -101,7 +125,7 @@ process LAUSANNE {
     """
     ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
     freesurfer_home=\$(dirname \$(dirname \$(which mri_label2vol)))
-    python $params.atlas_utils_folder/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
+    /usr/bin/python $params.atlas_utils_folder/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
         \$(dirname ${folder}) ${sid} \$freesurfer_home --scale ${scale} --dilation_factor 0 --log_level DEBUG
 
     mri_convert ${folder}/mri/rawavg.mgz rawavg.nii.gz

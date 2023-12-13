@@ -49,10 +49,16 @@ DESCRIPTION
                                                     └-- metrics
                                                         └-- METRIC_NAME.nii.gz  [Optional]
 
+    --recon_all                                 If set, will use traditional freesurfer recon-all command to produce
+                                                anatomical surfaces. ($recon_all)
+    --recon_surf                                If set, will use CNN based FastSurfer and recon-surf to produce
+                                                anatomical surfaces (way faster!). ($recon_surf)
     --use_freesurfer_atlas                      If set, will use the freesurfer atlas if -profile connectomics is used.
                                                 ($use_freesurfer_atlas)
     --use_brainnetome_atlas                     If set, will use the brainnetome atlas if -profile connectomics is used.
                                                 This is the default setting. ($use_brainnetome_atlas)
+    --use_brainnetome_child_atlas               If set, will use the brainnetome child atlas if -profile connectomcis
+                                                is used. This is the default setting. ($use_brainnetome_child_atlas)
     --use_glasser_atlas                         If set, will use the Glasser atlas if -profile connectomics is used.
                                                 ($use_glasser_atlas)
     --use_schaefer_100_atlas                    If set, will use the Schaefer 100 atlas if -profile connectomics is used.
@@ -83,6 +89,8 @@ OPTIONAL ARGUMENTS (current value)
                                                 the path of folder within the container. ($atlas_utils_folder)
     --nb_threads                                Number of threads used by recon-all and the atlases creation
                                                 ($nb_threads)
+    --compute_BN_child                          Compute the connectivity-friendly Brainnetome Child atlas.
+                                                ($compute_BN_child)
     --compute_FS_BN_GL_SF                       Compute the connectivity-friendly atlases : ($compute_FS_BN_GL_SF)
                                                     * FreeSurfer (adapted)
                                                     * Brainnetome
