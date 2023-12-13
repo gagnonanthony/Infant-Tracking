@@ -7,7 +7,7 @@ process COMMIT {
     memory params.commit_memory_limit
 
     input:
-        tuple val(sid), path(h5), path(dwi), path(bval), path(bvec), path(peaks), path(para_diff), path(iso_diff)
+        tuple val(sid), path(h5), path(dwi), path(bval), path(bvec), path(peaks), path(para_diff), path(iso_diff), path(perp_diff)
     output:
         tuple val(sid), path("${sid}__decompose_commit.h5"), emit: h5_commit, optional: true
         tuple val(sid), path("${sid}__essential_tractogram.trk"), emit: trk_commit, optional: true
@@ -19,8 +19,8 @@ process COMMIT {
     
     script:
     def para_diff_arg = para_diff ? "--para_diff \$(cat $para_diff)" : "--para_diff $params.para_diff"
-    def iso_diff_arg = iso_diff ? "--iso_diff \$(cat $iso_diff)" : "--iso_diff $params.iso_diff" 
-    def perp_diff_arg = params.ball_stick ? "" : "--perp_diff $params.perp_diff"
+    def iso_diff_arg = iso_diff ? "--iso_diff \$(cat $iso_diff)" : "--iso_diff $params.iso_diff"
+    def perp_diff_arg = perp_diff ? "--perp_diff \$(cat $perp_diff)" : "--perp_diff $params.perp_diff"
     def ball_stick_arg = params.ball_stick ? "--ball_stick" : ""
 
     if ( params.use_commit2 && !params.use_both ) {

@@ -491,6 +491,7 @@ def display_run_info () {
         log.info "COMMIT OPTIONS"
         log.info "Run COMMIT: $params.run_commit"
         log.info "Use COMMIT2: $params.use_commit2"
+        log.info "Use both COMMIT: $params.use_both_commit"
         log.info "COMMIT on trk: $params.commit_on_trk"
         log.info "B-value threshold: $params.b_thr"
         log.info "Number of directions: $params.nbr_dir"

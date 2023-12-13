@@ -340,7 +340,7 @@ def display_usage () {
                 "roi_radius_priors":"$params.roi_radius",
                 "run_commit":"$params.run_commit",
                 "use_commit2":"$params.use_commit2",
-                "use_both":"$params.use_both",
+                "use_both_commit":"$params.use_both_commit",
                 "commit_on_trk":"$params.commit_on_trk",
                 "b_thr":"$params.b_thr",
                 "ball_stick":"$params.ball_stick",

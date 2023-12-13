@@ -74,12 +74,22 @@ workflow CONNECTOMICS {
             // ** Running COMMIT1 or COMMIT2 ** //
             if ( params.use_both ) {
 
-            commit_channel = INITIAL_DECOMPOSE.out.decompose
-                                .combine(dwi_peaks_channel, by: 0)
-                                .combine(COMPUTE_PRIORS.out.para_diff, by: 0)
-                                .combine(COMPUTE_PRIORS.out.iso_diff, by: 0)
+                if ( params.compute_priors ) {
+                    commit_channel = INITIAL_DECOMPOSE.out.decompose
+                                    .combine(dwi_peaks_channel, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.para_diff, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.iso_diff, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.perp_diff, by: 0)
+                    COMMIT(commit_channel)
+                } else {
+                    commit_channel = INITIAL_DECOMPOSE.out.decompose
+                                    .combine(dwi_peaks_channel, by: 0)
+                                    .combine(Channel.of([[]]))
+                                    .combine(Channel.of([[]]))
+                                    .combine(Channel.of([[]]))
+                    COMMIT(commit_channel)
+                }
 
-            COMMIT(commit_channel)
             decompose_channel = COMMIT.out.trk_commit
                                     .combine(TRANSFORM_LABELS.out.labels_warped, by: 0)
             FINAL_DECOMPOSE(decompose_channel)
@@ -89,12 +99,22 @@ workflow CONNECTOMICS {
                                     .combine(fodf_channel, by: 0)
             }
             else {
-            commit_channel = INITIAL_DECOMPOSE.out.decompose
-                                .combine(dwi_peaks_channel, by: 0)
-                                .combine([], by: 0)
-                                .combine([], by: 0)
-
-            COMMIT(commit_channel)
+                
+                if ( params.compute_priors ) {
+                    commit_channel = INITIAL_DECOMPOSE.out.decompose
+                                    .combine(dwi_peaks_channel, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.para_diff, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.iso_diff, by: 0)
+                                    .combine(COMPUTE_PRIORS.out.perp_diff, by: 0)
+                    COMMIT(commit_channel)
+                } else {
+                    commit_channel = INITIAL_DECOMPOSE.out.decompose
+                                    .combine(dwi_peaks_channel, by: 0)
+                                    .combine(Channel.of([[]]))
+                                    .combine(Channel.of([[]]))
+                                    .combine(Channel.of([[]]))
+                    COMMIT(commit_channel)
+                }
             // ** Setting output channel ** //
             afd_fixel_channel = COMMIT.out.h5_commit
                                     .combine(fodf_channel, by: 0)
