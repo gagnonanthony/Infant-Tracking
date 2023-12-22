@@ -72,7 +72,7 @@ workflow CONNECTOMICS {
             INITIAL_DECOMPOSE(decompose_channel)
 
             // ** Running COMMIT1 or COMMIT2 ** //
-            if ( params.use_both ) {
+            if ( params.use_both_commit ) {
 
                 if ( params.compute_priors ) {
                     commit_channel = INITIAL_DECOMPOSE.out.decompose

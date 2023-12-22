@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 process SEGMENT_TISSUES {
     cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(anat)
@@ -31,6 +33,8 @@ process SEGMENT_TISSUES {
 
 process ATROPOS_SEG {
     cpus 1
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(anat), path(mask)
@@ -55,6 +59,8 @@ process ATROPOS_SEG {
 
 process GENERATE_MASKS {
     cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(wm_mask), path(fa)
@@ -79,6 +85,8 @@ process GENERATE_MASKS {
 
 process LOCAL_TRACKING_MASK {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(wm), path(fa)
@@ -104,6 +112,8 @@ process LOCAL_TRACKING_MASK {
 
 process LOCAL_SEEDING_MASK {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(wm), path(fa)
@@ -129,6 +139,8 @@ process LOCAL_SEEDING_MASK {
 
 process LOCAL_TRACKING {
     cpus 2
+    memory { 16.GB * task.attempt }
+    time { 8.hour * task.attempt }
 
     input:
         tuple val(sid), path(fodf), path(seeding_mask), path(tracking_mask)
@@ -155,6 +167,8 @@ process LOCAL_TRACKING {
 
 process PFT_SEEDING_MASK {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(wm), path(fa), path(interface_mask)
@@ -188,6 +202,8 @@ process PFT_SEEDING_MASK {
 
 process PFT_TRACKING_MASK {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(wm), path(gm), path(csf)
@@ -211,6 +227,8 @@ process PFT_TRACKING_MASK {
 
 process PFT_TRACKING {
     cpus 2
+    memory { 16.GB * task.attempt }
+    time { 15.hour * task.attempt }
 
     input:
         tuple val(sid), path(fodf), path(include), path(exclude), path(seed)

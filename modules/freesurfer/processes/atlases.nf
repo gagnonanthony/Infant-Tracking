@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 process FS_BN_GL_SF {
     cpus params.nb_threads
+    memory { 24.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(folder)
@@ -38,6 +40,8 @@ process FS_BN_GL_SF {
 
 process BN_CHILD {
     cpus params.nb_threads
+    memory { 24.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(folder)
@@ -62,6 +66,8 @@ process BN_CHILD {
 
 process LOBES {
     cpus params.nb_threads
+    memory { 24.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(folder)
@@ -104,6 +110,8 @@ process LOBES {
 
 process LAUSANNE {
     cpus 1
+    memory { 24.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(folder)

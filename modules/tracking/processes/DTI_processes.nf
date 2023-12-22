@@ -3,7 +3,9 @@
 nextflow.enable.dsl=2
 
 process EXTRACT_DTI_SHELL {
-    cpus 3
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -36,7 +38,9 @@ process EXTRACT_DTI_SHELL {
 }
 
 process DTI_METRICS {
-    cpus 3
+    cpus 1
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)

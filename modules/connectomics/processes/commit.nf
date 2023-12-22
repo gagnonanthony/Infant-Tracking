@@ -4,7 +4,8 @@ nextflow.enable.dsl=2
 
 process COMMIT {
     cpus params.processes_commit
-    memory params.commit_memory_limit
+    memory { params.commit_memory_limit * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(h5), path(dwi), path(bval), path(bvec), path(peaks), path(para_diff), path(iso_diff), path(perp_diff)
@@ -23,7 +24,7 @@ process COMMIT {
     def perp_diff_arg = perp_diff ? "--perp_diff \$(cat $perp_diff)" : "--perp_diff $params.perp_diff"
     def ball_stick_arg = params.ball_stick ? "--ball_stick" : ""
 
-    if ( params.use_commit2 && !params.use_both ) {
+    if ( params.use_commit2 && !params.use_both_commit ) {
     """
     scil_run_commit.py $h5 $dwi $bval $bvec "${sid}__results_bzs/" --ball_stick --commit2 \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir\
@@ -31,7 +32,7 @@ process COMMIT {
     mv "${sid}__results_bzs/commit_2/decompose_commit.h5" "./${sid}__decompose_commit.h5"
     """
     }
-    else if ( params.use_both ) {
+    else if ( params.use_both_commit ) {
     """
     scil_run_commit.py $h5 $dwi $bval $bvec "${sid}__results_bzs_1/" --ball_stick --commit2 \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir\
@@ -54,7 +55,8 @@ process COMMIT {
 
 process COMMIT_ON_TRK {
     cpus params.processes_commit
-    memory params.commit_memory_limit
+    memory { params.commit_memory_limit * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(trk_h5), path(dwi), path(bval), path(bvec), path(peaks)
@@ -83,6 +85,8 @@ process COMMIT_ON_TRK {
 
 process COMPUTE_PRIORS {
     cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(fa), path(md), path(ad), path(rd)
@@ -111,6 +115,8 @@ process COMPUTE_PRIORS {
 
 process AVERAGE_PRIORS {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(para_diff), path(iso_diff), path(perp_diff)

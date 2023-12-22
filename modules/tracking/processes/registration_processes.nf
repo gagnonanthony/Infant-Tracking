@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 process REGISTER_T2 {
     cpus params.processes_registration
+    memory { 16.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(md), path(t2w), path(wm_mask)
@@ -56,6 +58,8 @@ process REGISTER_T2 {
 
 process REGISTER_T1 {
     cpus params.processes_registration
+    memory { 16.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(fa), path(t1), path(t1_mask), path(b0)

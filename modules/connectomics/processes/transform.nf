@@ -4,7 +4,8 @@ nextflow.enable.dsl=2
 
 process TRANSFORM_LABELS {
     cpus 1
-    memory '2 GB'
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(labels), path(t2), path(mat), path(syn)
@@ -21,7 +22,8 @@ process TRANSFORM_LABELS {
 
 process TRANSFORM_T1 {
     cpus 1
-    memory '2 GB'
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(t1), path(dwi), path(bval), path(bvec), path(mat), path(syn)

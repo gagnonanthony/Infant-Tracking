@@ -3,7 +3,9 @@
 nextflow.enable.dsl=2
 
 process BET_DWI {
-    cpus 2
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -38,7 +40,9 @@ process BET_DWI {
 }
 
 process BET_T2 {
-    cpus 2
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(anat)
@@ -57,6 +61,8 @@ process BET_T2 {
 
 process DENOISING {
     cpus params.processes_denoise_dwi
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi)
@@ -70,13 +76,15 @@ process DENOISING {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    dwidenoise $dwi ${sid}__dwi_denoised.nii.gz -extent 7 -nthreads 6
+    dwidenoise $dwi ${sid}__dwi_denoised.nii.gz -extent 7 -nthreads $task.cpus
     fslmaths ${sid}__dwi_denoised.nii.gz -thr 0 ${sid}__dwi_denoised.nii.gz
     """
 }
 
 process TOPUP {
     cpus 4
+    memory { 8.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(revb0)
@@ -111,6 +119,7 @@ process TOPUP {
 process EDDY_TOPUP {
     cpus params.processes_eddy
     memory { 5.GB * task.attempt }
+    time { 4.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0s_corrected), path(field), path(movpar)
@@ -148,6 +157,8 @@ process EDDY_TOPUP {
 
 process N4 {
     cpus 1
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -174,6 +185,8 @@ process N4 {
 
 process CROP_DWI {
     cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(b0_mask)
@@ -197,6 +210,8 @@ process CROP_DWI {
 
 process DENOISE_T1 {
     cpus params.processes_denoise_t1
+    memory { 2.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(t1)
@@ -217,6 +232,8 @@ process DENOISE_T1 {
 
 process N4_T1 {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(t1)
@@ -238,6 +255,8 @@ process N4_T1 {
 
 process CROP_ANAT {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(anat), path(mask)
@@ -259,6 +278,8 @@ process CROP_ANAT {
 
 process RESAMPLE_T1 {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(t1)
@@ -280,6 +301,8 @@ process RESAMPLE_T1 {
 
 process BET_T1 {
     cpus params.processes_bet_t1
+    memory { 16.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(t1)
@@ -306,6 +329,8 @@ process BET_T1 {
 
 process RESAMPLE_ANAT {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(t2w), path(mask)
@@ -331,6 +356,8 @@ process RESAMPLE_ANAT {
 
 process NORMALIZE {
     cpus 3
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -373,7 +400,9 @@ process NORMALIZE {
 }
 
 process RESAMPLE_DWI {
-    cpus 3
+    cpus 1
+    memory { 6.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(mask)
@@ -397,7 +426,9 @@ process RESAMPLE_DWI {
 }
 
 process EXTRACT_B0 {
-    cpus 3
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -417,6 +448,8 @@ process EXTRACT_B0 {
 
 process DWI_MASK {
     cpus 1
+    memory { 8.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)

@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 process FREESURFER {
     cpus params.nb_threads
+    memory { 24.GB * task.attempt }
+    time { 6.hour * task.attempt }
 
     input:
         tuple val(sid), path(anat)
@@ -21,6 +23,9 @@ process FREESURFER {
 
 process RECON_SURF {
     cpus params.nb_threads
+    memory { 24.GB * task.attempt }
+    time { 6.hour * task.attempt }
+
 
     input:
         tuple val(sid), path(anat)

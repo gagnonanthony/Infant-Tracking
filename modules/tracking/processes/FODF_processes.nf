@@ -3,7 +3,9 @@
 nextflow.enable.dsl=2
 
 process FODF_SHELL {
-    cpus 3
+    cpus 1
+    memory { 8.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -40,7 +42,9 @@ process FODF_SHELL {
 }
 
 process COMPUTE_FRF {
-    cpus 3
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
@@ -70,6 +74,8 @@ process COMPUTE_FRF {
 
 process MEAN_FRF {
     cpus 1
+    memory { 2.GB * task.attempt }
+    time { 1.hour * task.attempt }
     publishDir = "${params.output_dir}/MEAN_FRF"
 
     input:
@@ -87,6 +93,8 @@ process MEAN_FRF {
 
 process FODF_METRICS {
     cpus params.processes_fodf
+    memory { 8.GB * task.attempt }
+    time { 3.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa), path(md), path(frf)
