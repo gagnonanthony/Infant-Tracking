@@ -140,7 +140,7 @@ process LOCAL_SEEDING_MASK {
 process LOCAL_TRACKING {
     cpus 2
     memory { 16.GB * task.attempt }
-    time { 8.hour * task.attempt }
+    time { 12.hour * task.attempt }
 
     input:
         tuple val(sid), path(fodf), path(seeding_mask), path(tracking_mask)
@@ -228,7 +228,7 @@ process PFT_TRACKING_MASK {
 process PFT_TRACKING {
     cpus 2
     memory { 16.GB * task.attempt }
-    time { 15.hour * task.attempt }
+    time { 20.hour * task.attempt }
 
     input:
         tuple val(sid), path(fodf), path(include), path(exclude), path(seed)
