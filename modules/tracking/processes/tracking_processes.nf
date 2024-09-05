@@ -227,8 +227,8 @@ process PFT_TRACKING_MASK {
 
 process PFT_TRACKING {
     cpus 2
-    memory { 16.GB * task.attempt }
-    time { 15.hour * task.attempt }
+    memory { 31.GB * task.attempt }
+    time { 24.hour * task.attempt }
 
     input:
         tuple val(sid), path(fodf), path(include), path(exclude), path(seed)

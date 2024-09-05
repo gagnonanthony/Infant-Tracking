@@ -4,8 +4,8 @@ nextflow.enable.dsl=2
 
 process COMMIT {
     cpus params.processes_commit
-    memory { params.commit_memory_limit * task.attempt }
-    time { 4.hour * task.attempt }
+    memory { 31.GB * task.attempt }
+    time { 8.hour * task.attempt }
 
     input:
         tuple val(sid), path(h5), path(dwi), path(bval), path(bvec), path(peaks), path(para_diff), path(iso_diff), path(perp_diff)

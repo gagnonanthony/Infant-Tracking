@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 process FREESURFER {
     cpus params.nb_threads
-    memory { 24.GB * task.attempt }
+    memory { 31.GB * task.attempt }
     time { 6.hour * task.attempt }
 
     input:
@@ -23,8 +23,8 @@ process FREESURFER {
 
 process RECON_SURF {
     cpus params.nb_threads
-    memory { 24.GB * task.attempt }
-    time { 6.hour * task.attempt }
+    memory { 31.GB * task.attempt }
+    time { 10.hour * task.attempt }
 
 
     input:

@@ -58,8 +58,8 @@ process REGISTER_T2 {
 
 process REGISTER_T1 {
     cpus params.processes_registration
-    memory { 16.GB * task.attempt }
-    time { 4.hour * task.attempt }
+    memory { 24.GB * task.attempt }
+    time { 6.hour * task.attempt }
 
     input:
         tuple val(sid), path(fa), path(t1), path(t1_mask), path(b0)

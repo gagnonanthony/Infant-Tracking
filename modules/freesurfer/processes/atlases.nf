@@ -40,7 +40,7 @@ process FS_BN_GL_SF {
 
 process BN_CHILD {
     cpus params.nb_threads
-    memory { 24.GB * task.attempt }
+    memory { 31.GB * task.attempt }
     time { 2.hour * task.attempt }
 
     input:
@@ -51,6 +51,7 @@ process BN_CHILD {
         tuple val(sid), path("*brainnetome_child_v1_dilate.nii.gz"), emit: brainnetome_child_dilated
         path("*[brainnetome_child]*.txt")
         path("*[brainnetome_child]*.json")
+        path("*.stats")
 
     when:
         params.compute_BN_child
