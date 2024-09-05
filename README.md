@@ -2,9 +2,9 @@ ChildBrainFlow Pipeline
 =======================
 
 ChildBrainFlow is an end-to-end pipeline that performs tractography, t1 reconstruction and connectomics.
-It is essentially a merged version of multiple individual pipeline to avoid the handling of inputs/outputs
+It is essentially a merged version of multiple individual pipelines to avoid the handling of inputs/outputs
 between flows with some parameters tuned for pediatric brain scans. Here is a list of flows from which
-process have been taken:
+processes have been taken:
 
     1. TractoFlow (https://github.com/scilus/tractoflow.git) [1]
     2. FreeSurfer-Flow (https://github.com/scilus/freesurfer_flow)
@@ -17,7 +17,7 @@ Nextflow
 --------
 To install nextflow, please see : https://www.nextflow.io/docs/latest/getstarted.html#requirements 
 
-The pipeline export by default a `` parameters.json `` within the output directory to provide a documentation of the parameters used during the execution. For a more detailed report (excluding execution's parameters), the default feature of nextflow `` -with-report <report_name.html> `` can be used to export a html report. Simply had this your command line when launching the pipeline: 
+The pipeline export by default a `` parameters.json `` within the output directory to provide a documentation of the parameters used during the execution. For a more detailed report (excluding execution's parameters), the default feature of nextflow `` -with-report <report_name.html> `` can be used to export a html report. Simply add this your command line when launching the pipeline: 
 
 ```
 nextflow run main.nf --input <input> <other_arguments> -with-report <report_name.html>
@@ -30,7 +30,7 @@ The pipeline comes with a recipe file (`` /containers/apptainer_recipe.def ``) c
 dependencies to successfully run every profiles. To build the apptainer image, run this command: 
 
 ```
-sudo apptainer build <image_name> </path/to/apptainer_recipe.def
+sudo apptainer build <image_name> </path/to/apptainer_recipe.def>
 ```
 
 Docker
