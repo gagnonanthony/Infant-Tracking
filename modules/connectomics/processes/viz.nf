@@ -4,8 +4,8 @@ nextflow.enable.dsl=2
 
 process VISUALIZE_CONNECTIVITY {
     cpus 1
-    label "VIZ"
-    memory "2 GB"
+    memory { 2.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(npy)

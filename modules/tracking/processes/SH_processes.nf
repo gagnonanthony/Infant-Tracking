@@ -3,8 +3,9 @@
 nextflow.enable.dsl=2
 
 process SH_FITTING_SHELL {
-    label "SH_FITTING"
-    cpus 3
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.h * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -23,8 +24,9 @@ process SH_FITTING_SHELL {
 }
 
 process SH_FITTING {
-    label "SH_FITTING"
     cpus 1
+    memory { 8.GB * task.attempt }
+    time { 1.h * task.attempt }
     
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)

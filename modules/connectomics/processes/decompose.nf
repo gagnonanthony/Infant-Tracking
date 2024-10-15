@@ -4,8 +4,8 @@ nextflow.enable.dsl=2
 
 process DECOMPOSE_CONNECTIVITY {
     cpus 1
-    memory { 7.B * trk.size() }
-    label "DECOMPOSE_CONNECTIVITY"
+    memory { 31.GB * task.attempt }
+    time { 12.hour * task.attempt }
 
     input:
         tuple val(sid), path(trk), path(labels)

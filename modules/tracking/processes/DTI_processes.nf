@@ -3,8 +3,9 @@
 nextflow.enable.dsl=2
 
 process EXTRACT_DTI_SHELL {
-    label "EXTRACT_DTI_SHELL"
-    cpus 3
+    cpus 1
+    memory { 4.GB * task.attempt }
+    time { 1.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
@@ -13,32 +14,33 @@ process EXTRACT_DTI_SHELL {
         path("${sid}__bvec_dti"), emit: dti_files
     script:
     if (params.dti_shells)
-      """
+    """
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
         scil_extract_dwi_shell.py $dwi \
-          $bval $bvec $params.dti_shells ${sid}__dwi_dti.nii.gz \
-          ${sid}__bval_dti ${sid}__bvec_dti -t $params.dwi_shell_tolerance -f
-      """
+            $bval $bvec $params.dti_shells ${sid}__dwi_dti.nii.gz \
+            ${sid}__bval_dti ${sid}__bvec_dti -t $params.dwi_shell_tolerance -f
+    """
     else
-      """
+    """
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
 
         shells=\$(awk -v max="$params.max_dti_shell_value" '{for (i = 1; i <= NF; i++) {v = int(\$i);if (v <= max) shells[v] = 1;}}END {for (v in shells) print v;}' "$bval" |\
-                 sort -n | tr '\n' ' ')
+                sort -n | tr '\n' ' ')
 
         scil_extract_dwi_shell.py $dwi \
-          $bval $bvec \$shells ${sid}__dwi_dti.nii.gz \
-          ${sid}__bval_dti ${sid}__bvec_dti -t $params.dwi_shell_tolerance -f
-      """
+            $bval $bvec \$shells ${sid}__dwi_dti.nii.gz \
+            ${sid}__bval_dti ${sid}__bvec_dti -t $params.dwi_shell_tolerance -f
+    """
 }
 
 process DTI_METRICS {
-    label "DTI_METRICS"
-    cpus 3
+    cpus 1
+    memory { 8.GB * task.attempt }
+    time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
