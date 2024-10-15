@@ -57,7 +57,7 @@ workflow DWI {
             if ( params.weights ) {
                 weights_ch = Channel.fromPath(params.weights)
             } else {
-                weights_ch = null
+                weights_ch = []
             }
             synthstrip_channel = EDDY_TOPUP.out.dwi_bval_bvec
                 .map{ [it[0], it[1], it[2]] }
