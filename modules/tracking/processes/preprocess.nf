@@ -4,13 +4,14 @@ nextflow.enable.dsl=2
 
 process BET_DWI {
     cpus 1
-    memory { 4.GB * task.attempt }
+    memory { 8.GB * task.attempt }
     time { 2.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec)
     output:
         tuple val(sid), path("${sid}__dwi_bet.nii.gz"), emit: bet_dwi
+        tuple val(sid), path("${sid}__powder_avg_bet_mask.nii.gz"), emit: bet_mask
     when:
         !params.skip_dwi_preprocessing
 
@@ -35,6 +36,43 @@ process BET_DWI {
     scil_image_math.py convert ${sid}__powder_avg_bet_mask.nii.gz ${sid}__powder_avg_bet_mask.nii.gz\
         --data_type uint8 -f
     mrcalc $dwi ${sid}__powder_avg_bet_mask.nii.gz -mult ${sid}__dwi_bet.nii.gz\
+        -quiet -force -nthreads 1
+    """
+}
+
+process SYNTHSTRIP {
+    cpus 12
+    memory { 16.GB * task.attempt }
+    time { 6.hour * task.attempt }
+
+    input:
+        tuple val(sid), path(dwi), path(bval), path(weights)
+    output:
+        tuple val(sid), path("${sid}__dwi_bet.nii.gz"),         emit: bet_dwi
+        tuple val(sid), path("${sid}__dwi_bet_mask.nii.gz"),    emit: bet_mask
+    when:
+        !params.skip_dwi_preprocessing
+
+    script:
+    def b0_thr = params.b0_thr ? "--b0_thr ${params.b0_thr}" : ''
+    def shells = params.shells ? "--shells ${params.shells}" : ''
+    def shell_thr = params.shell_thr ? "--shell_thr ${params.shell_thr}" : ''
+
+    def gpu = params.gpu ? "--gpu" : ""
+    def border = params.border ? "-b " + params.border : ""
+    def nocsf = params.nocsf ? "--no-csf" : ""
+    def model = "$weights" ? "--model $weights" : ""
+
+    // ** Using SynthStrip with infant weights on powder average image. ** //
+    """
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
+    export OMP_NUM_THREADS=1
+    export OPENBLAS_NUM_THREADS=1
+    scil_compute_powder_average.py $dwi $bval ${sid}__powder_avg.nii.gz \
+        $b0_thr $shells $shell_thr
+    mri_synthstrip -i ${sid}__powder_avg.nii.gz --out image_bet.nii.gz\
+        --mask ${sid}__dwi_bet_mask.nii.gz $gpu $border $nocsf $model
+    mrcalc $dwi ${sid}__dwi_bet_mask.nii.gz -mult ${sid}__dwi_bet.nii.gz\
         -quiet -force -nthreads 1
     """
 }
@@ -118,8 +156,8 @@ process TOPUP {
 
 process EDDY_TOPUP {
     cpus params.processes_eddy
-    memory { 5.GB * task.attempt }
-    time { 4.hour * task.attempt }
+    memory { 16.GB * task.attempt }
+    time { 16.hour * task.attempt }
 
     input:
         tuple val(sid), path(dwi), path(bval), path(bvec), path(b0s_corrected), path(field), path(movpar)

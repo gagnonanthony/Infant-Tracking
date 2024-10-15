@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 
 include {
     BET_DWI;
+    SYNTHSTRIP;
     BET_T2;
     BET_T1;
     DENOISING;
@@ -29,16 +30,15 @@ workflow DWI {
 
     main:
 
-        // ** Bet ** //
-        BET_DWI(dwi_channel)
-
         // ** Denoising ** //
-        DENOISING(BET_DWI.out)
+        denoising_channel = dwi_channel
+            .map{[it[0], it[1]]}
+        DENOISING(denoising_channel)
         
         // ** Topup ** //
         topup_channel = dwi_channel
             .map{[it[0], it[2], it[3]]}
-            .combine(DENOISING.out, by: 0)
+            .combine(DENOISING.out.denoised_dwi, by: 0)
             .combine(rev_channel, by: 0)
             .map{ sid, bvals, bvecs, dwi, rev -> tuple(sid, dwi, bvals, bvecs, rev)}
         TOPUP(topup_channel)
@@ -52,9 +52,25 @@ workflow DWI {
                                                                                 field, movpar)}
         EDDY_TOPUP(eddy_channel)
         
+        // ** Bet ** //
+        if ( params.run_synthbet ) {
+            weights_ch = Channel.fromPath(params.weights)
+            synthstrip_channel = EDDY_TOPUP.out.dwi_bval_bvec
+                .map{ [it[0], it[1], it[2]] }
+                .combine(weights_ch)
+            SYNTHSTRIP(synthstrip_channel)
+            dwi = SYNTHSTRIP.out.bet_dwi
+            mask = SYNTHSTRIP.out.bet_mask
+        } else {
+            BET_DWI(EDDY_TOPUP.out.dwi_bval_bvec)
+            dwi = BET_DWI.out.bet_dwi
+            mask = BET_DWI.out.bet_mask
+        }
+
         // ** N4 ** //
-        n4_channel = EDDY_TOPUP.out.dwi_bval_bvec
-            .combine(EDDY_TOPUP.out.b0_mask, by: 0)
+        n4_channel = dwi.combine(EDDY_TOPUP.out.dwi_bval_bvec, by: 0)
+            .map{ [it[0], it[1], it[3], it[4]] }
+            .combine(mask, by: 0)
         N4(n4_channel)
 
         // ** Crop ** //
