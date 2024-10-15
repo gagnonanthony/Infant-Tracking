@@ -54,10 +54,15 @@ workflow DWI {
         
         // ** Bet ** //
         if ( params.run_synthbet ) {
-            weights_ch = Channel.fromPath(params.weights)
+            if ( params.weights ) {
+                weights_ch = Channel.fromPath(params.weights)
+            } else {
+                weights_ch = null
+            }
             synthstrip_channel = EDDY_TOPUP.out.dwi_bval_bvec
                 .map{ [it[0], it[1], it[2]] }
                 .combine(weights_ch)
+                .map{ it[0..2] + [it[3] ?: []] }
             SYNTHSTRIP(synthstrip_channel)
             dwi = SYNTHSTRIP.out.bet_dwi
             mask = SYNTHSTRIP.out.bet_mask

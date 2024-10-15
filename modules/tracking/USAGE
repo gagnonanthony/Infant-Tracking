@@ -67,6 +67,17 @@ OPTIONAL ARGUMENTS (current value)
     --use_slice_drop_correction                 If set, will use the slice drop correction from EDDY.
                                                 ($use_slice_drop_correction)
 
+    SYNTHSTRIP OPTIONS
+    --run_synthbet                              Run SynthStrip to perform brain extraction on the DWI volume.
+                                                ($run_synthbet)
+    --shells                                    Shell to use when computing the powder average prior to
+                                                SynthStrip. ($shells)
+    --shell_thr                                 B-values threshold for shell extraction. ($shell_thr)
+    --gpu                                       Run on GPU. ($gpu)
+    --border                                    Mask border threshold in mm. ($border)
+    --nocsf                                     Exclude CSF from brain border. ($nocsf)
+    --weights                                   Alternative model weights file. ($weights)
+
     NORMALIZATION OPTIONS
     --fa_mask_threshold                         Threshold to use when creating the fa mask for normalization.
                                                 ($fa_mask_threshold)

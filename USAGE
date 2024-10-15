@@ -32,9 +32,9 @@ Here is a list of available profiles:
                             local modelling and tractography (see [1] for details).
     2. connectomics :       If selected, labels registration, tractogram segmentation and connectivity will be 
                             performed.
-    3. freesurfer :         If selected, FreeSurfer Recon-all will be run on input T1s and label files will be 
-                            generated (available atlases: freesurfer, brainnetome and glasser). Only available
-                            if T1 volume is supplied as input (therefore, not with -profile infant). 
+    3. freesurfer :         If selected, FreeSurfer Recon-all (or FastSurfer) will be run on input T1s and label files will be 
+                            generated (available atlases: freesurfer's atlases, Brainnetome, Brainnetome Child and Glasser). 
+                            Only available if T1 volume is supplied as input (therefore, not with -profile infant). 
     4. infant :             If selected, the pipeline will assume the data is from infant patients (< 2 years old)
                             and adapt some parameters to perform tractography and connectomics.
 
