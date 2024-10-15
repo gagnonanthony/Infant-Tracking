@@ -93,7 +93,7 @@ process COMPUTE_PRIORS {
     output:
         tuple val("Priors"), path("${sid}__para_diff.txt"), emit: para_diff
         tuple val("Priors"), path("${sid}__iso_diff.txt"), emit: iso_diff
-        tuple val("Priors"), path("${sid}__perp_diff.txt"), emit: perp_diff
+        tuple val("Priors"), path("${sid}__perp_diff.txt"), emit: perp_diff, optional: true
         tuple val(sid), path("${sid}__mask_1fiber.nii.gz"), emit: mask_1fiber
         tuple val(sid), path("${sid}__mask_ventricles.nii.gz"), emit: mask_ventricles
 
@@ -101,6 +101,7 @@ process COMPUTE_PRIORS {
         params.run_commit && params.compute_priors
 
     script:
+    if ( params.multishell ) {
     """
     scil_compute_NODDI_priors.py $fa $ad $rd $md \
         --out_txt_1fiber_para ${sid}__para_diff.txt \
@@ -111,6 +112,18 @@ process COMPUTE_PRIORS {
         --fa_min $params.fa_min_priors --fa_max $params.fa_max_priors \
         --md_min $params.md_min_priors --roi_radius $params.roi_radius_priors
     """
+    }
+    else {
+    """
+    scil_compute_NODDI_priors.py $fa $ad $md \
+        --out_txt_1fiber ${sid}__para_diff.txt \
+        --out_txt_ventricles ${sid}__iso_diff.txt \
+        --out_mask_1fiber ${sid}__mask_1fiber.nii.gz \
+        --out_mask_ventricles ${sid}__mask_ventricles.nii.gz \
+        --fa_min $params.fa_min_priors --fa_max $params.fa_max_priors \
+        --md_min $params.md_min_priors --roi_radius $params.roi_radius_priors
+    """
+    }
 }
 
 process AVERAGE_PRIORS {

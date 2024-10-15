@@ -16,6 +16,7 @@ include {
 workflow FREESURFERFLOW {
     take:
         anat
+        utils
 
     main:
 
@@ -31,18 +32,21 @@ workflow FREESURFERFLOW {
         t1 = RECON_SURF.out.final_t1
         }
 
+        // ** Combining atlases and utils channels ** //
+        atlases_channel = folder_channel.combine(utils)
+
         // ** Computing FS_BN_GL_SF atlases ** //
-        FS_BN_GL_SF(folder_channel)
+        FS_BN_GL_SF(atlases_channel)
 
         // ** Computing BN_CHILD Atlas ** //
-        BN_CHILD(folder_channel)
+        BN_CHILD(atlases_channel)
 
         // ** Computing lobes atlases ** //
-        LOBES(folder_channel)
+        LOBES(atlases_channel)
 
         // ** Computing lausanne atlas ** //
         scales = Channel.from(1,2,3,4,5)
-        LAUSANNE(folder_channel,
+        LAUSANNE(atlases_channel,
                 scales)
 
         // ** Reorganizing Lausanne multiscale atlas channel ** //

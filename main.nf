@@ -50,10 +50,12 @@ workflow {
         if ( params.run_freesurfer ) {
             data = get_data_freesurfer()
 
-            FREESURFERFLOW(data.anat)
+            utils = Channel.fromPath(params.atlas_utils_folder)    
+            FREESURFERFLOW(data.anat, utils)
+
         }
 
-        if ( params.priors ) {
+        if ( params.priors && !params.run_tracking ) {
 
             data = get_data_tracking()
 
@@ -114,6 +116,14 @@ workflow {
             TRACKING(REGISTRATION.out.warped_anat,
                     FODF.out.fodf,
                     fa_channel)
+        }
+
+        if ( params.priors && params.run_tracking ) {
+
+            data = get_data_tracking()
+
+            PRIORS(DWI.out.dwi_bval_bvec)
+
         }
 
         if ( params.run_connectomics && params.run_tracking ) {

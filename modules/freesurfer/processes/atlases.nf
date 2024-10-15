@@ -8,7 +8,7 @@ process FS_BN_GL_SF {
     time { 4.hour * task.attempt }
 
     input:
-        tuple val(sid), path(folder)
+        tuple val(sid), path(folder), path(utils)
 
     output:
         tuple val(sid), path("*freesurfer_v5.nii.gz"), emit: freesurfer
@@ -31,8 +31,8 @@ process FS_BN_GL_SF {
 
     script:
     """
-    ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
-    bash $params.atlas_utils_folder/freesurfer_utils/generate_atlas_FS_BN_GL_SF_v5.sh \$(dirname ${folder}) \
+    ln -s $utils/fsaverage \$(dirname ${folder})/
+    bash $utils/freesurfer_utils/generate_atlas_FS_BN_GL_SF_v5.sh \$(dirname ${folder}) \
         ${sid} ${params.nb_threads} FS_BN_GL_SF_Atlas/
     cp $sid/FS_BN_GL_SF_Atlas/* ./
     """
@@ -44,7 +44,7 @@ process BN_CHILD {
     time { 2.hour * task.attempt }
 
     input:
-        tuple val(sid), path(folder)
+        tuple val(sid), path(folder), path(utils)
 
     output:
         tuple val(sid), path("*brainnetome_child_v1.nii.gz"), emit: brainnetome_child
@@ -58,8 +58,8 @@ process BN_CHILD {
 
     script:
     """
-    ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
-    bash $params.atlas_utils_folder/freesurfer_utils/generate_atlas_BN_child.sh \$(dirname ${folder}) \
+    ln -s $utils/fsaverage \$(dirname ${folder})/
+    bash $utils/freesurfer_utils/generate_atlas_BN_child.sh \$(dirname ${folder}) \
         ${sid} ${params.nb_threads} Child_Atlas/
     cp $sid/Child_Atlas/* ./
     """
@@ -71,7 +71,7 @@ process LOBES {
     time { 1.hour * task.attempt }
 
     input:
-        tuple val(sid), path(folder)
+        tuple val(sid), path(folder), path(utils)
 
     output: 
         path("*lobes*.nii.gz"), emit: lobes
@@ -105,7 +105,7 @@ process LOBES {
         51 52 53 54 58 60 --volume_ids wmparc.nii.gz 47 --volume_ids wmparc.nii.gz 16 --merge
     scil_dilate_labels.py atlas_lobes_v5.nii.gz atlas_lobes_v5_dilate.nii.gz --distance 2 \
         --labels_to_dilate 1 2 3 4 5 6 8 9 10 11 12 14 15 --mask brain_mask.nii.gz
-    cp $params.atlas_utils_folder/freesurfer_utils/*lobes_v5* ./
+    cp $utils/freesurfer_utils/*lobes_v5* ./
     """
 }
 
@@ -115,7 +115,7 @@ process LAUSANNE {
     time { 4.hour * task.attempt }
 
     input:
-        tuple val(sid), path(folder)
+        tuple val(sid), path(folder), path(utils)
         each scale
 
     output:
@@ -132,9 +132,9 @@ process LAUSANNE {
 
     script:
     """
-    ln -s $params.atlas_utils_folder/fsaverage \$(dirname ${folder})/
+    ln -s $utils/fsaverage \$(dirname ${folder})/
     freesurfer_home=\$(dirname \$(dirname \$(which mri_label2vol)))
-    /usr/bin/python $params.atlas_utils_folder/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
+    /usr/bin/python $utils/lausanne_multi_scale_atlas/generate_multiscale_parcellation.py \
         \$(dirname ${folder}) ${sid} \$freesurfer_home --scale ${scale} --dilation_factor 0 --log_level DEBUG
 
     mri_convert ${folder}/mri/rawavg.mgz rawavg.nii.gz
@@ -146,7 +146,7 @@ process LAUSANNE {
     scil_dilate_labels.py lausanne_2008_scale_${scale}.nii.gz lausanne_2008_scale_${scale}_dilate.nii.gz \
         --distance 2 --mask mask.nii.gz
     
-    cp $params.atlas_utils_folder/lausanne_multi_scale_atlas/*.txt ./
-    cp $params.atlas_utils_folder/lausanne_multi_scale_atlas/*.json ./
+    cp $utils/lausanne_multi_scale_atlas/*.txt ./
+    cp $utils/lausanne_multi_scale_atlas/*.json ./
     """
 }

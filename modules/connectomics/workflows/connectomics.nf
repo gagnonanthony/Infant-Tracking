@@ -49,7 +49,7 @@ workflow CONNECTOMICS {
         // ** If -profile infant is used, first part will be run. COMMIT1 is the only supported ** //
         // ** method as of now, since running commit2 requires a decomposition first, which is not an ** //
         // ** easy task on infant data. This will be improved in the future. ** //
-        if ( params.infant_config ) {
+        if ( params.commit_on_trk ) {
 
             // ** COMMIT1 processing on trk ** //
             commit_channel = tracking_channel
