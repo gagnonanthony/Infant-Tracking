@@ -55,7 +55,7 @@ process COMMIT {
 
 process COMMIT_ON_TRK {
     cpus params.processes_commit
-    memory { params.commit_memory_limit * task.attempt }
+    memory { 24.GB * task.attempt }
     time { 4.hour * task.attempt }
 
     input:
