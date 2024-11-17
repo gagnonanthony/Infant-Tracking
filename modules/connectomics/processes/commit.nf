@@ -26,6 +26,7 @@ process COMMIT {
 
     if ( params.use_commit2 && !params.use_both_commit ) {
     """
+    export DIPY_HOME="./"
     scil_run_commit.py $h5 $dwi $bval $bvec "${sid}__results_bzs/" --ball_stick --commit2 \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir\
         $para_diff_arg $iso_diff_arg
@@ -34,6 +35,7 @@ process COMMIT {
     }
     else if ( params.use_both_commit ) {
     """
+    export DIPY_HOME="./"
     scil_run_commit.py $h5 $dwi $bval $bvec "${sid}__results_bzs_1/" --ball_stick --commit2 \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir\
         $para_diff_arg $iso_diff_arg
@@ -45,6 +47,7 @@ process COMMIT {
     }
     else {
     """
+    export DIPY_HOME="./"
     scil_run_commit.py $h5 $dwi $bval $bvec "${sid}__results_bzs/" --in_peaks $peaks \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir $ball_stick_arg \
         $para_diff_arg $iso_diff_arg $perp_diff_arg
@@ -76,6 +79,7 @@ process COMMIT_ON_TRK {
         perp_diff_arg="--perp_diff $params.perp_diff"
     }
     """
+    export DIPY_HOME="./"
     scil_run_commit.py $trk_h5 $dwi $bval $bvec "${sid}__results_bzs/" --in_peaks $peaks \
         --processes $params.processes_commit --b_thr $params.b_thr --nbr_dir $params.nbr_dir $ball_stick_arg \
         --para_diff $params.para_diff $perp_diff_arg --iso_diff $params.iso_diff
